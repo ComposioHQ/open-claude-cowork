@@ -466,8 +466,16 @@ async function handleSendMessage(e) {
   const contentDiv = assistantMessage.querySelector('.message-content');
 
   try {
-    // Pass chatId for session management
-    const response = await window.electronAPI.sendMessage(message, currentChatId);
+    // Pass chatId, model, and files for full functionality
+    const response = await window.electronAPI.sendMessage(message, currentChatId, {
+      model: selectedModel,
+      files: attachedFiles.length > 0 ? attachedFiles : undefined
+    });
+
+    // Clear attached files after sending
+    attachedFiles = [];
+    renderAttachedFiles(isFirstMessage ? 'home' : 'chat');
+
     const reader = await response.getReader();
     let buffer = '';
     let hasContent = false;
