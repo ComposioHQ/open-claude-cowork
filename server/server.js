@@ -27,10 +27,18 @@ app.use(express.json());
 
 // Chat endpoint using Claude Agent SDK
 app.post('/api/chat', async (req, res) => {
-  const { message, chatId, userId = 'default-user' } = req.body;
+  const {
+    message,
+    chatId,
+    userId = 'default-user',
+    model = 'claude-sonnet-4-5-20250514',
+    files = []
+  } = req.body;
 
   console.log('[CHAT] Request received:', message);
   console.log('[CHAT] Chat ID:', chatId);
+  console.log('[CHAT] Model:', model);
+  console.log('[CHAT] Files attached:', files.length);
 
   if (!message) {
     return res.status(400).json({ error: 'Message is required' });
@@ -57,8 +65,21 @@ app.post('/api/chat', async (req, res) => {
     const existingSessionId = chatId ? chatSessions.get(chatId) : null;
     console.log('[CHAT] Existing session ID for', chatId, ':', existingSessionId || 'none (new chat)');
 
-    // Build query options
+    // Build prompt with file contents if files are attached
+    let fullPrompt = message;
+    if (files && files.length > 0) {
+      const fileContents = files.map(file => {
+        if (file.type.startsWith('image/')) {
+          return `[Attached image: ${file.name}]`;
+        }
+        return `--- File: ${file.name} ---\n${file.data}\n--- End of ${file.name} ---`;
+      }).join('\n\n');
+      fullPrompt = `${message}\n\nAttached files:\n${fileContents}`;
+    }
+
+    // Build query options with selected model
     const queryOptions = {
+      model: model,
       allowedTools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'WebSearch', 'WebFetch', 'TodoWrite'],
       maxTurns: 20,
       mcpServers: {
@@ -81,7 +102,7 @@ app.post('/api/chat', async (req, res) => {
 
     // Stream responses from Claude Agent SDK
     for await (const chunk of query({
-      prompt: message,
+      prompt: fullPrompt,
       options: queryOptions
     })) {
       // Debug: log all system messages to find session_id
