@@ -15,6 +15,7 @@ export class OpencodeProvider extends BaseProvider {
     this.port = config.port || 4096;
     this.useExistingServer = config.useExistingServer || false;
     this.existingServerUrl = config.existingServerUrl || null;
+    this.browserPath = config.browserPath || process.env.BROWSER_PATH || null;
   }
 
   get name() {
@@ -37,10 +38,20 @@ export class OpencodeProvider extends BaseProvider {
       } else {
         // Create new Opencode server and client
         console.log('[Opencode] Creating new server on', this.hostname, ':', this.port);
-        const { client, server } = await createOpencode({
+        const createOptions = {
           hostname: this.hostname,
           port: this.port
-        });
+        };
+        
+        // Add browser path if configured
+        if (this.browserPath) {
+          console.log('[Opencode] Using custom browser:', this.browserPath);
+          createOptions.browser = {
+            executablePath: this.browserPath
+          };
+        }
+        
+        const { client, server } = await createOpencode(createOptions);
         this.client = client;
         this.serverInstance = server;
       }
