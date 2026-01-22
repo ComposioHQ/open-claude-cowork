@@ -18,13 +18,28 @@
   <a href="https://github.com/anthropics/claude-code">
     <img src="https://img.shields.io/badge/Powered%20by-Claude%20Code-purple" alt="Claude Code">
   </a>
-  <a href="https://twitter.com/composio">
+  <a href="https://dub.composio.dev/discord">
+    <img src="https://img.shields.io/badge/Discord-Join%20Community-5865F2?logo=discord&logoColor=white" alt="Discord">
+  </a>
+  <a href="https://x.com/composio">
     <img src="https://img.shields.io/twitter/follow/composio?style=social" alt="Twitter">
+  </a>
+  <a href="https://github.com/ComposioHQ/open-claude-cowork/stargazers">
+    <img src="https://img.shields.io/github/stars/ComposioHQ/open-claude-cowork?style=social" alt="GitHub Stars">
   </a>
 </p>
 
 <p align="center">
-  An open-source desktop chat application powered by Claude Agent SDK and Composio Tool Router. Build AI agents with access to 500+ tools and persistent chat sessions.
+  <strong>An open-source Claude desktop app that doesn't just chat — it takes action.</strong>
+</p>
+
+<p align="center">
+  Send emails, create PRs, manage calendars, post to Slack — all from natural language prompts.<br/>
+  Powered by <a href="https://composio.dev/toolkits">800+ tool integrations</a> via Composio.
+</p>
+
+<p align="center">
+  <a href="./README_ZH.md">简体中文</a> | English
 </p>
 
 <p align="center">
@@ -35,12 +50,51 @@
 
 ---
 
+## Why This One?
+
+Most Claude desktop apps are GUI wrappers — they give you a nice interface, but Claude can only chat.
+
+**Open Claude Cowork connects Claude to the real world.** Through Composio's tool router, Claude can actually execute actions: read your emails, create GitHub issues, update your CRM, schedule meetings, and more.
+
+| Capability | Open Claude Cowork | Typical Claude GUIs |
+|------------|-------------------|---------------------|
+| **External Integrations** | 800+ apps (Gmail, Slack, GitHub, Calendar, Salesforce, HubSpot, Linear, etc.) | None |
+| **Multi-Model Support** | Claude + GPT-5 + Grok + GLM + MiniMax | Claude only |
+| **Execute Real Actions** | Sends emails, creates PRs, schedules meetings | Chat only |
+| **Open Source** | Yes | Yes |
+
+---
+
+## What You Can Do
+
+### Developer Workflow
+> "Review my open GitHub PRs and summarize them in Slack #dev-updates"
+
+Claude reads your PRs via GitHub API, analyzes them, and posts a formatted summary to Slack.
+
+### Email Triage
+> "Check my Gmail for urgent emails and draft responses for the top 3"
+
+Claude scans your inbox, identifies priority messages, and drafts contextual replies.
+
+### Meeting Prep
+> "Look at my Google Calendar for tomorrow and create a prep doc in Google Drive"
+
+Claude pulls your schedule and generates a meeting brief with relevant context.
+
+### Code + Communicate
+> "Fix the bug in issue #42, create a PR, and notify the team on Slack"
+
+Claude reads the issue, writes the fix, opens a PR, and posts an update — all in one prompt.
+
+---
+
 ## Features
 
 - **Multi-Provider Support** - Choose between Claude Agent SDK and Opencode for different model options
 - **Claude Agent SDK Integration** - Full agentic capabilities with tool use and multi-turn conversations
 - **Opencode SDK Support** - Access multiple LLM providers (Claude, GPT-5, Grok, GLM, MiniMax, and more)
-- **Composio Tool Router** - Access to 500+ external tools (Gmail, Slack, GitHub, Google Drive, and more)
+- **Composio Tool Router** - Access to 800+ external tools (Gmail, Slack, GitHub, Google Drive, and more)
 - **Persistent Chat Sessions** - Conversations maintain context across messages using SDK session management
 - **Multi-Chat Support** - Create and switch between multiple chat sessions
 - **Real-time Streaming** - Server-Sent Events (SSE) for smooth, token-by-token response streaming
@@ -201,7 +255,7 @@ The app uses Claude Agent SDK's built-in session management:
 
 Composio Tool Router provides MCP server integration:
 - Tools are authenticated per-user via Composio dashboard
-- Available tools include Google Workspace, Slack, GitHub, and 500+ more
+- Available tools include Google Workspace, Slack, GitHub, and 800+ more
 - Tool calls are streamed and displayed in real-time
 
 ### Provider Architecture
