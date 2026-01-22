@@ -71,8 +71,11 @@ export async function clearProviderCache() {
 export async function initializeProviders() {
   console.log('[Providers] Initializing providers...');
   try {
-    // Get and initialize opencode provider
-    const opencodeProvider = getProvider('opencode');
+    // Get and initialize opencode provider with browser configuration
+    const opencodeConfig = {
+      browserPath: process.env.BROWSER_PATH
+    };
+    const opencodeProvider = getProvider('opencode', opencodeConfig);
     await opencodeProvider.initialize();
     console.log('[Providers] Opencode provider initialized');
   } catch (error) {

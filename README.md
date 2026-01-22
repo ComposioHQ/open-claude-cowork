@@ -135,6 +135,16 @@ OPENCODE_PORT=4096
 
 # Composio Integration
 COMPOSIO_API_KEY=your-composio-api-key
+
+# Browser Configuration (optional)
+# Specify a custom browser executable path for Opencode's browser automation
+# Useful if your default browser is not supported (e.g., Brave)
+# Leave empty to use system default browser
+# Examples:
+# macOS: BROWSER_PATH=/Applications/Chromium.app/Contents/MacOS/Chromium
+# Linux: BROWSER_PATH=/usr/bin/chromium-browser
+# Windows: BROWSER_PATH=C:\Program Files\Chromium\Application\chrome.exe
+BROWSER_PATH=
 ```
 
 **Provider Selection:**
@@ -338,6 +348,18 @@ open-claude-cowork/
 - Check that model identifiers match Opencode format (e.g., `opencode/big-pickle`)
 - Review Opencode API documentation for available models
 - Check server logs for Opencode SDK initialization errors
+
+**"Browser not supported as default browser"**
+- Opencode's browser automation may not support all browsers (e.g., Brave)
+- Set `BROWSER_PATH` in `.env` to specify a supported browser (Chromium, Firefox, or WebKit)
+- Common browser paths:
+  - **macOS Chromium**: `/Applications/Chromium.app/Contents/MacOS/Chromium`
+  - **macOS Firefox**: `/Applications/Firefox.app/Contents/MacOS/firefox`
+  - **Linux Chromium**: `/usr/bin/chromium-browser`
+  - **Linux Firefox**: `/usr/bin/firefox`
+  - **Windows Chromium**: `C:\Program Files\Chromium\Application\chrome.exe`
+- Restart the backend server after changing `.env`
+- Leave `BROWSER_PATH` empty to use the system default browser
 
 ---
 
