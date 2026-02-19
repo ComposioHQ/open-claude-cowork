@@ -4,7 +4,7 @@ import { createInterface } from 'readline'
 import { existsSync, readFileSync, writeFileSync, readdirSync } from 'fs'
 import { fileURLToPath } from 'url'
 import path from 'path'
-import { execSync } from 'child_process'
+import { execSync, spawn } from 'child_process'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const CONFIG_PATH = path.join(__dirname, 'config.js')
@@ -156,9 +156,11 @@ async function terminalChat() {
 
       // Play system sound and show desktop notification (macOS)
       try {
-        execSync('afplay /System/Library/Sounds/Glass.aiff &', { stdio: 'ignore' })
-        const escapedMsg = message.replace(/"/g, '\\"').replace(/'/g, "'\"'\"'")
-        execSync(`osascript -e 'display notification "${escapedMsg}" with title "Clawd" sound name "Glass"'`, { stdio: 'ignore' })
+        const safeMessage = String(message).replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+        const script = `display notification "${safeMessage}" with title "Clawd" sound name "Glass"`
+        const soundProc = spawn('afplay', ['/System/Library/Sounds/Glass.aiff'], { stdio: 'ignore', detached: true })
+        soundProc.unref()
+        spawn('osascript', ['-e', script], { stdio: 'ignore' })
       } catch (e) {
         process.stdout.write('\x07')
       }

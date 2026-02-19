@@ -1,3 +1,5 @@
+import { getProviderSession } from '../supabase/session-store.js';
+
 /**
  * Base provider interface for AI agent providers.
  * All providers must implement these methods.
@@ -40,21 +42,49 @@ export class BaseProvider {
   }
 
   /**
-   * Get or create a session for a chat
+   * Get or create a session for a chat.
+   * Checks in-memory Map first, falls back to Supabase DB lookup.
    * @param {string} chatId
-   * @returns {string|null} Session ID if exists
+   * @param {string} [userId]
+   * @returns {Promise<string|null>} Session ID if exists
    */
-  getSession(chatId) {
-    return this.sessions.get(chatId) || null;
+  _buildSessionKey(chatId, userId) {
+    if (userId === undefined || userId === null) return chatId;
+    return `${userId}:${chatId}`;
+  }
+
+  async getSession(chatId, userId) {
+    if (!chatId) return null;
+    const key = this._buildSessionKey(chatId, userId);
+    const cached = this.sessions.get(key);
+    if (cached) return cached;
+
+    // Fall back to DB
+    try {
+      const shouldSkipUserScope = userId === undefined || userId === null || String(userId).startsWith('anonymous');
+      const dbSession = await (shouldSkipUserScope
+        ? getProviderSession(chatId, this.name)
+        : getProviderSession(chatId, this.name, userId));
+      if (dbSession) {
+        this.sessions.set(key, dbSession);
+        return dbSession;
+      }
+    } catch {
+      // DB unavailable — proceed without session
+    }
+    return null;
   }
 
   /**
    * Store a session ID for a chat
    * @param {string} chatId
    * @param {string} sessionId
+   * @param {string} [userId]
    */
-  setSession(chatId, sessionId) {
-    this.sessions.set(chatId, sessionId);
+  setSession(chatId, sessionId, userId) {
+    if (!chatId) return;
+    const key = this._buildSessionKey(chatId, userId);
+    this.sessions.set(key, sessionId);
   }
 
   /**

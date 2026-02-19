@@ -3,329 +3,622 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claude</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' http://localhost:3001 https://*.supabase.co; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-src 'none';">
+  <title>Open Claude Cowork</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@17.0.2/lib/marked.umd.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.3.1/dist/purify.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.3/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+  <script src="web-api.js"></script>
+  <script src="auth.js"></script>
 </head>
 <body>
+  <!-- Backend Health Banner -->
+  <div id="backendBanner" class="backend-banner hidden" role="alert">
+    <strong>Backend offline</strong> &mdash; Run <code>npm run start:all</code> to connect.
+    <button type="button" id="backendBannerDismiss">Dismiss</button>
+  </div>
+
   <div class="app-container">
-    <!-- Left Sidebar - Chat History -->
+    <!-- 1. Navigation Rail -->
+    <nav class="nav-rail">
+      <div class="nav-rail-top">
+        <button class="nav-rail-item active" data-view="home" title="Home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        </button>
+        <button class="nav-rail-item" id="chatSidebarBtn" data-view="chat" title="Chats">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </button>
+        <div class="nav-rail-divider"></div>
+        <button class="nav-rail-item" id="jobsSidebarBtn" data-view="jobs" title="Workflows">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        </button>
+        <button class="nav-rail-item" id="vaultSidebarBtn" data-view="vault" title="Vault">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+        </button>
+        <button class="nav-rail-item" id="reportsSidebarBtn" data-view="reports" title="Reports">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        </button>
+        <button class="nav-rail-item hidden" id="navDbBtn" data-view="database" title="Database Explorer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+        </button>
+      </div>
+      <div class="nav-rail-bottom">
+        <button class="nav-rail-item" id="settingsSidebarBtn" data-view="settings" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-1.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h1.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v1.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-1.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+        <!-- User Avatar Placeholder -->
+        <div class="nav-rail-item hidden" id="navSignOutBtn" title="Sign Out">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 2. Left Sidebar (History) -->
     <aside class="left-sidebar" id="leftSidebar">
       <div class="left-sidebar-header">
         <button class="new-chat-sidebar-btn" onclick="startNewChat()" title="New chat">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          <span>New Chat</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          New Chat
         </button>
         <button class="sidebar-collapse-btn" id="leftSidebarToggle" title="Collapse sidebar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
       </div>
+
+      <div class="sidebar-folders-section">
+        <div class="folders-header">
+          <span id="sidebarFoldersTitle">Folders</span>
+          <button class="new-folder-btn" id="newFolderBtn" title="New Folder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+        </div>
+        <div class="chat-folders-list" id="chatFoldersList"></div>
+        <div class="workflow-folders-list hidden" id="workflowFoldersList"></div>
+        <div class="report-folders-list hidden" id="reportFoldersList"></div>
+      </div>
+
       <div class="chat-history-list" id="chatHistoryList">
-        <!-- Chat history items will be added here -->
+        <!-- History items -->
+      </div>
+      <div class="left-sidebar-footer" style="padding:16px;">
+        <span class="user-email-label" id="userEmailLabel"></span>
       </div>
     </aside>
 
     <!-- Left Sidebar Expand Button (visible when collapsed) -->
-    <button class="left-sidebar-expand-btn" id="leftSidebarExpand" title="Expand chat history">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="9 18 15 12 9 6"></polyline>
-      </svg>
+    <button class="left-sidebar-expand-btn hidden" id="leftSidebarExpand" title="Expand chat history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
     </button>
 
-    <!-- Main Content -->
-    <div class="main-content">
-      <!-- Home View (shown when no messages) -->
-      <div class="home-view" id="homeView">
-      <div class="greeting-section">
-        <div class="greeting">
-          <h1 class="greeting-text">Open Claude Cowork</h1>
-          <p class="tagline">Powered by Claude Code and Composio</p>
+    <!-- 3. Main Content -->
+    <main class="main-content">
+      
+      <!-- AUTH VIEW -->
+      <div class="auth-view hidden" id="authView">
+        <div class="auth-container">
+          <h1 class="auth-title">Welcome Back</h1>
+          <p class="auth-subtitle">Sign in to your AI workspace</p>
+          <form id="authForm">
+            <input type="email" id="authEmail" class="auth-input" placeholder="name@company.com" required>
+            <input type="password" id="authPassword" class="auth-input" placeholder="Password" required>
+            <div id="authDisplayNameField" class="hidden">
+              <input type="text" id="authDisplayName" class="auth-input" placeholder="Display Name">
+            </div>
+            <button type="submit" class="auth-submit-btn" id="authSubmitBtn">Sign In</button>
+            <div style="margin-top:16px; text-align:center; font-size:13px;">
+              <span class="auth-tab active" data-tab="signin" style="cursor:pointer; color:var(--text-primary);">Sign In</span>
+              <span style="color:var(--text-tertiary); margin:0 8px;">|</span>
+              <span class="auth-tab" data-tab="signup" style="cursor:pointer; color:var(--text-secondary);">Sign Up</span>
+            </div>
+            <p class="auth-options">
+              <button type="button" class="auth-link hidden" id="authForgotPasswordBtn" style="background:none;border:none;color:var(--text-tertiary);cursor:pointer;margin-top:8px;">Forgot password?</button>
+            </p>
+            <p class="auth-error hidden" id="authError" style="color:var(--accent-danger); margin-top:12px; font-size:13px; text-align:center;"></p>
+            <p class="auth-info hidden" id="authInfo" style="color:var(--accent-success); margin-top:12px; font-size:13px; text-align:center;"></p>
+            
+            <!-- Hidden but required by JS -->
+            <button type="button" id="authSkipBtn" class="hidden"></button>
+          </form>
         </div>
       </div>
 
-      <div class="input-container home-input">
-        <form id="homeForm" class="input-form">
-          <div class="input-wrapper">
-            <textarea
-              id="homeInput"
-              class="message-input"
-              placeholder="Ask me anything"
-              autocomplete="off"
-              rows="1"
-            ></textarea>
-            <div class="input-controls">
-              <div class="left-controls">
-                <input type="file" id="homeFileInput" class="file-input-hidden" multiple />
-                <button type="button" class="control-btn attach-btn" id="homeAttachBtn" title="Attach file">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                  </svg>
-                </button>
-                <button type="button" class="control-btn thinking-btn" id="homeThinkingBtn" title="Extended thinking ⇧⌘E">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                  </svg>
-                </button>
-              </div>
-              <div class="right-controls">
-                <!-- Provider Selector Dropdown -->
-                <div class="dropdown-container" id="homeProviderDropdown">
-                  <button type="button" class="provider-selector">
-                    <span class="provider-label">Claude</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                  </button>
-                  <div class="dropdown-menu provider-menu">
-                    <div class="dropdown-item selected" data-value="claude">
-                      <div class="item-row">
-                        <span class="item-label">Claude</span>
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                      </div>
-                      <span class="item-desc">Claude Agent SDK</span>
-                    </div>
-                    <div class="dropdown-item" data-value="opencode">
-                      <div class="item-row">
-                        <span class="item-label">Opencode</span>
-                      </div>
-                      <span class="item-desc">Opencode SDK</span>
-                    </div>
-                  </div>
-                </div>
-                <!-- Model Selector Dropdown -->
-                <div class="dropdown-container" id="homeModelDropdown">
-                  <button type="button" class="model-selector">
-                    <span class="model-label">Sonnet 4.5</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                  </button>
-                  <div class="dropdown-menu model-menu" data-provider="claude">
-                    <div class="dropdown-item" data-value="claude-opus-4-5-20250514">
-                      <div class="item-row">
-                        <span class="item-label">Opus 4.5</span>
-                      </div>
-                      <span class="item-desc">Most capable for complex work</span>
-                    </div>
-                    <div class="dropdown-item selected" data-value="claude-sonnet-4-5-20250514">
-                      <div class="item-row">
-                        <span class="item-label">Sonnet 4.5</span>
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                      </div>
-                      <span class="item-desc">Best for everyday tasks</span>
-                    </div>
-                    <div class="dropdown-item" data-value="claude-haiku-4-5-20250514">
-                      <div class="item-row">
-                        <span class="item-label">Haiku 4.5</span>
-                      </div>
-                      <span class="item-desc">Fastest for quick answers</span>
-                    </div>
-                  </div>
-                </div>
-                <button type="submit" class="send-btn" id="homeSendBtn" disabled>
-                  <svg class="send-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <line x1="12" y1="19" x2="12" y2="5"></line>
-                    <polyline points="5 12 12 5 19 12"></polyline>
-                  </svg>
-                  <svg class="stop-icon hidden" viewBox="0 0 24 24" fill="currentColor">
-                    <rect x="6" y="6" width="12" height="12" rx="2"></rect>
-                  </svg>
-                </button>
-              </div>
+      <!-- HOME VIEW -->
+      <div class="home-view" id="homeView">
+        <h1 class="greeting-text">Open Claude Cowork</h1>
+        <p class="tagline">Your AI Operating System for Automation & Context</p>
+
+        <div class="quick-actions-grid">
+          <div class="quick-action-card" onclick="showView('jobs')">
+            <div class="quick-action-icon workflows">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div>
+              <div class="quick-action-title">Workflows</div>
+              <div class="quick-action-desc">Automate tasks</div>
             </div>
           </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Chat View (shown when there are messages) -->
-    <div class="chat-view hidden" id="chatView">
-      <div class="chat-main">
-        <header class="chat-header">
-          <button class="chat-title-btn">
-            <span id="chatTitle">New chat</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
-          <button class="new-chat-btn" onclick="startNewChat()" title="New chat">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-          </button>
-        </header>
-
-        <div class="messages-container" id="chatMessages">
-          <!-- Messages will be added here dynamically -->
+          <div class="quick-action-card" onclick="showView('vault')">
+            <div class="quick-action-icon vault">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            </div>
+            <div>
+              <div class="quick-action-title">Vault</div>
+              <div class="quick-action-desc">Manage files</div>
+            </div>
+          </div>
+          <div class="quick-action-card" onclick="showView('reports')">
+            <div class="quick-action-icon reports">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            </div>
+            <div>
+              <div class="quick-action-title">Analytics</div>
+              <div class="quick-action-desc">View usage</div>
+            </div>
+          </div>
         </div>
 
-        <div class="chat-input-wrapper">
-          <div class="input-container">
-            <form id="chatForm" class="input-form">
-              <div class="input-wrapper">
-                <textarea
-                  id="messageInput"
-                  class="message-input"
-                  placeholder="Reply..."
-                  autocomplete="off"
-                  rows="1"
-                ></textarea>
-                <div class="input-controls">
-                  <div class="left-controls">
-                    <input type="file" id="chatFileInput" class="file-input-hidden" multiple />
-                    <button type="button" class="control-btn attach-btn" id="chatAttachBtn" title="Attach file">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                      </svg>
-                    </button>
-                    <button type="button" class="control-btn thinking-btn" id="chatThinkingBtn" title="Extended thinking ⇧⌘E">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                      </svg>
-                    </button>
-                  </div>
-                  <div class="right-controls">
-                    <!-- Provider Selector Dropdown -->
-                    <div class="dropdown-container" id="chatProviderDropdown">
-                      <button type="button" class="provider-selector">
-                        <span class="provider-label">Claude</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                      </button>
-                      <div class="dropdown-menu provider-menu">
-                        <div class="dropdown-item selected" data-value="claude">
-                          <div class="item-row">
-                            <span class="item-label">Claude</span>
-                            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                          </div>
-                          <span class="item-desc">Claude Agent SDK</span>
-                        </div>
-                        <div class="dropdown-item" data-value="opencode">
-                          <div class="item-row">
-                            <span class="item-label">Opencode</span>
-                          </div>
-                          <span class="item-desc">Opencode SDK</span>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- Model Selector Dropdown -->
-                    <div class="dropdown-container" id="chatModelDropdown">
-                      <button type="button" class="model-selector">
-                        <span class="model-label">Sonnet 4.5</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                      </button>
-                      <div class="dropdown-menu model-menu" data-provider="claude">
-                        <div class="dropdown-item" data-value="claude-opus-4-5-20250514">
-                          <div class="item-row">
-                            <span class="item-label">Opus 4.5</span>
-                          </div>
-                          <span class="item-desc">Most capable for complex work</span>
-                        </div>
-                        <div class="dropdown-item selected" data-value="claude-sonnet-4-5-20250514">
-                          <div class="item-row">
-                            <span class="item-label">Sonnet 4.5</span>
-                            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                          </div>
-                          <span class="item-desc">Best for everyday tasks</span>
-                        </div>
-                        <div class="dropdown-item" data-value="claude-haiku-4-5-20250514">
-                          <div class="item-row">
-                            <span class="item-label">Haiku 4.5</span>
-                          </div>
-                          <span class="item-desc">Fastest for quick answers</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button type="submit" class="send-btn" id="chatSendBtn" disabled>
-                      <svg class="send-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <line x1="12" y1="19" x2="12" y2="5"></line>
-                        <polyline points="5 12 12 5 19 12"></polyline>
-                      </svg>
-                      <svg class="stop-icon hidden" viewBox="0 0 24 24" fill="currentColor">
-                        <rect x="6" y="6" width="12" height="12" rx="2"></rect>
-                      </svg>
-                    </button>
-                  </div>
+        <div class="input-container home-input">
+          <form id="homeForm">
+            <div class="input-wrapper">
+              <textarea id="homeInput" class="message-input" placeholder="Ask Claude to do something..." rows="1"></textarea>
+              <div class="input-controls">
+                <div class="left-controls">
+                   <input type="file" id="homeFileInput" class="file-input-hidden" multiple />
+                   <button type="button" class="control-btn" id="homeAttachBtn" title="Attach">
+                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                   </button>
+                   <button type="button" class="control-btn hidden" id="homeVaultPickerBtn"></button>
+                </div>
+                <div class="right-controls">
+                  <button type="submit" class="send-btn" id="homeSendBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                  </button>
                 </div>
               </div>
-            </form>
-          </div>
-          <p class="disclaimer">Claude is AI and can make mistakes. Please double-check responses.</p>
+            </div>
+          </form>
         </div>
       </div>
 
-      <!-- Right Sidebar -->
-      <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-          <h3>Progress</h3>
-          <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </button>
+      <!-- CHAT VIEW -->
+      <div class="chat-view hidden" id="chatView">
+        <div class="chat-main">
+          <header class="chat-header">
+            <button class="chat-title-btn">
+              <span id="chatTitle">New Chat</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div style="display:flex; gap:8px;">
+              <button class="control-btn" id="sidebarToggle" title="Toggle Context">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+              </button>
+            </div>
+          </header>
+
+          <!-- CONTEXT BAR (New Feature) -->
+          <div class="context-bar" id="contextBar">
+             <div class="context-pill" id="ctxProjectPill">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+               <span id="ctxProjectName">No Project</span>
+             </div>
+             <div class="context-pill hidden" id="ctxDbPill">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+               <span id="ctxDbCount">0 Tables</span>
+             </div>
+          </div>
+
+          <!-- SEARCH (Restored) -->
+          <div class="search-container hidden" id="searchContainer" style="padding: 0 24px;">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search..." style="width:100%; padding:8px; border:1px solid var(--border-base); background:var(--bg-surface); color:var(--text-primary); border-radius:var(--radius-md);">
+          </div>
+          <div class="search-results hidden" id="searchResults"></div>
+
+          <div class="messages-container" id="chatMessages">
+            <!-- Messages go here -->
+          </div>
+
+          <div class="chat-input-wrapper">
+            <div class="input-container">
+              <form id="chatForm">
+                <div class="input-wrapper">
+                  <textarea id="messageInput" class="message-input" placeholder="Type a message..." rows="1"></textarea>
+                  <div class="input-controls">
+                    <div class="left-controls">
+                      <input type="file" id="chatFileInput" class="file-input-hidden" multiple />
+                      <button type="button" class="control-btn" id="chatAttachBtn" title="Attach">
+                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                      </button>
+                      <button type="button" class="control-btn hidden" id="chatVaultPickerBtn"></button>
+                      <button type="button" class="control-btn" id="chatThinkingBtn" title="Deep Thinking">
+                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                      </button>
+                    </div>
+                    <div class="right-controls">
+                      <button type="submit" class="send-btn" id="chatSendBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <p class="disclaimer">AI can make mistakes. Verify important information.</p>
+          </div>
         </div>
 
-        <!-- Steps/Todos Section -->
-        <div class="sidebar-section">
-          <div class="section-header" id="stepsHeader">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-            <span id="stepsCount">0 steps</span>
+        <!-- 4. Right Sidebar (Inspector) -->
+        <aside class="sidebar" id="sidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-tabs" id="sidebarTabs">
+              <button class="sidebar-tab active" data-tab="context" id="tabContext">Context</button>
+              <button class="sidebar-tab" data-tab="progress" id="tabProgress">Progress</button>
+              <button class="sidebar-tab" data-tab="artifact" id="tabArtifact">Artifacts</button>
+            </div>
           </div>
-          <div class="steps-list" id="stepsList">
-            <!-- Steps will be added here -->
-            <div class="empty-state" id="emptySteps">No active tasks</div>
+          
+          <div class="sidebar-panel" id="contextPanel" style="padding:16px;">
+            <div class="settings-field">
+              <label>Project Name</label>
+              <input type="text" id="contextProjectName" class="settings-input" placeholder="Project Name">
+            </div>
+            <div class="settings-field">
+              <label>Description</label>
+              <textarea id="contextProjectDesc" class="settings-textarea" rows="2" placeholder="Goal..."></textarea>
+            </div>
+             <div class="settings-field">
+              <label>Active Instructions</label>
+              <textarea id="contextActiveInstructions" class="settings-textarea" rows="3" placeholder="Rules..."></textarea>
+            </div>
+            
+            <div class="settings-field">
+               <label>Database</label>
+               <div id="contextTableList" style="max-height:150px; overflow-y:auto; border:1px solid var(--border-base); border-radius:var(--radius-md); padding:8px;"></div>
+            </div>
+
+            <!-- Integrations Containers (Restored) -->
+            <div id="contextNotionList"></div>
+            <button id="contextPinNotionBtn" class="hidden"></button>
+            <div id="contextClickUpList"></div>
+            <button id="contextPinClickUpBtn" class="hidden"></button>
+            <div id="contextGDriveList"></div>
+            <button id="contextPinGDriveBtn" class="hidden"></button>
+            <div id="contextYouTubeList"></div>
+            <button id="contextPinYouTubeBtn" class="hidden"></button>
+            <div id="contextWebList"></div>
+            <input type="hidden" id="contextWebInput">
+            <button id="contextAddWebBtn" class="hidden"></button>
+
+             <div class="settings-field">
+               <label>Pinned Files</label>
+               <div id="contextPinnedAssets" style="max-height:150px; overflow-y:auto;"></div>
+               <button class="settings-save-btn" id="contextPinAssetBtn" style="width:100%; margin-top:8px;">+ Pin from Vault</button>
+            </div>
+             
+             <!-- Usage Meter (Restored elements) -->
+             <div style="margin-top:16px;">
+               <div id="contextUsageBar" style="height:4px; background:var(--bg-surface); border-radius:2px;"></div>
+               <div id="contextUsageValue" style="font-size:11px; color:var(--text-tertiary); text-align:right; margin-top:4px;">0 / 200k</div>
+             </div>
+
+             <button class="settings-save-btn" id="saveContextBtn" style="width:100%; margin-top:16px;">Update Context</button>
+          </div>
+
+          <div class="sidebar-panel hidden" id="progressPanel" style="padding:16px;">
+            <div class="empty-state" style="color:var(--text-secondary);">No active tasks</div>
+          </div>
+          
+          <div class="sidebar-panel hidden" id="artifactPanel" style="padding:16px;">
+             <!-- Artifact IDs -->
+             <div id="artifactLangBadge" class="hidden"></div>
+             <div id="artifactTitle" class="hidden"></div>
+             <div id="artifactVersionInfo" class="hidden"></div>
+             <button id="artifactCopyBtn" class="hidden"></button>
+             <button id="artifactDownloadBtn" class="hidden"></button>
+             <button id="artifactUndoBtn" class="hidden"></button>
+             <button id="artifactRedoBtn" class="hidden"></button>
+             <div id="codeEditorWrap" class="hidden"><textarea id="codeEditor"></textarea><div id="lineNumbers"></div></div>
+             <div id="docEditorWrap" class="hidden"><div id="docToolbar"></div><div id="docEditor"></div></div>
+             <div class="empty-state" style="color:var(--text-secondary);">Select an artifact</div>
+          </div>
+        </aside>
+      </div>
+      
+      <!-- Right Sidebar Expand Button -->
+      <button class="right-sidebar-expand-btn hidden" id="rightSidebarExpand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+
+      <!-- SELECTION TOOLBAR -->
+      <div id="selectionToolbar" class="hidden"></div>
+
+      <!-- WORKFLOWS VIEW -->
+      <div class="jobs-view hidden" id="jobsView">
+        <header class="jobs-header">
+          <button class="jobs-back-btn hidden" id="jobsBackBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+          <h1 class="jobs-title">Workflows</h1>
+          <button class="settings-save-btn" id="jobsNewBtn">New Workflow</button>
+        </header>
+        <div class="jobs-content">
+          <div id="jobsList" class="quick-actions-grid" style="grid-template-columns: 1fr;"></div>
+          <div id="jobsUnavailable" class="hidden">Sign in required</div>
+
+          <!-- Workflow Form -->
+          <div id="jobsForm" class="hidden settings-section">
+             <h3 class="settings-section-title" id="jobsFormTitle">Workflow Builder</h3>
+             <div class="settings-field">
+                <label>Workflow Name</label>
+                <input type="text" id="jobName" class="settings-input" placeholder="e.g. Daily Digest">
+             </div>
+             <div class="settings-field">
+                <label>Description</label>
+                <input type="text" id="jobDescription" class="settings-input">
+             </div>
+             <div class="settings-field">
+                <label>Schedule</label>
+                <select id="jobSchedulePreset" class="settings-select">
+                   <option value="once">Run once</option>
+                   <option value="hourly">Every hour</option>
+                   <option value="daily">Every day</option>
+                </select>
+             </div>
+             <div id="jobExecuteAtField" class="settings-field"><label>Run At</label><input type="datetime-local" id="jobExecuteAt" class="settings-input"></div>
+             
+             <div class="settings-field">
+               <label>Action</label>
+               <select id="jobActionType" class="settings-select">
+                 <option value="chat_message">Chat Message</option>
+               </select>
+             </div>
+
+             <!-- Hidden fields required by JS -->
+             <div class="hidden">
+               <input type="text" id="jobType">
+               <input type="number" id="jobInterval">
+               <input type="text" id="jobCron">
+               <select id="jobReportId"></select>
+               <input type="text" id="jobWebhookUrl">
+               <select id="jobWebhookMethod"></select>
+               <select id="jobExportSource"></select>
+               <select id="jobExportFormat"></select>
+               <textarea id="jobChatMessagePrompt"></textarea>
+               <input type="text" id="jobChatMessageProvider">
+               <input type="number" id="jobChatMessageMaxTurns">
+               <select id="jobWorkflowId"></select>
+               
+               <div id="jobTypeField"></div>
+               <div id="jobIntervalField"></div>
+               <div id="jobCronField"></div>
+               <div id="jobReportField"></div>
+               <div id="jobWebhookUrlField"></div>
+               <div id="jobWebhookMethodField"></div>
+               <div id="jobExportSourceField"></div>
+               <div id="jobExportFormatField"></div>
+               <div id="jobChatMessagePromptField"></div>
+               <div id="jobChatMessageProviderField"></div>
+               <div id="jobChatMessageMaxTurnsField"></div>
+               <div id="jobRunWorkflowField"></div>
+             </div>
+
+             <div class="settings-mcp-form-actions">
+               <button class="settings-mcp-cancel-btn" id="jobCancelBtn">Cancel</button>
+               <button class="settings-mcp-save-btn" id="jobSaveBtn">Save</button>
+             </div>
+             <p id="jobFormStatus"></p>
           </div>
         </div>
+      </div>
 
-        <!-- Tool Calls Section -->
-        <div class="sidebar-section">
-          <div class="section-header">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-            </svg>
-            <span>Tool Calls</span>
-          </div>
-          <div class="tool-calls-list" id="toolCallsList">
-            <!-- Tool calls will be added here -->
-            <div class="empty-state" id="emptyTools">No tool calls yet</div>
-          </div>
+      <!-- DATABASE VIEW -->
+      <div class="db-view hidden" id="dbView">
+        <header class="db-header">
+           <button class="db-back-btn hidden" id="dbBackBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+           <h1 class="db-title">Database Explorer</h1>
+        </header>
+        <div class="db-content">
+           <div class="db-stats-banner">
+              <div class="db-stat-card"><span class="db-stat-value" id="dbStatTables">0</span><span class="db-stat-label">Tables</span></div>
+              <div class="db-stat-card"><span class="db-stat-value" id="dbStatSize">0MB</span><span class="db-stat-label">Size</span></div>
+              <div class="db-stat-card"><span class="db-stat-value" id="dbStatIndexes">0</span></div>
+              <div class="db-stat-card"><span class="db-stat-value" id="dbStatVersion"></span></div>
+              <div id="dbExtensions"></div>
+           </div>
+           <div class="db-panels">
+              <div class="db-table-list-panel" id="dbTableList"></div>
+              <div class="db-detail-panel" id="dbDetailPanel">
+                 <div id="dbTabs" class="hidden"></div>
+                 <div id="dbDataTab">
+                    <div id="dbDataToolbar">
+                       <input type="text" id="dbSearchInput">
+                       <select id="dbPageSize"></select>
+                       <span id="dbPageInfo"></span>
+                       <button id="dbPrevPage"></button>
+                       <button id="dbNextPage"></button>
+                    </div>
+                    <div id="dbDataTableWrapper">
+                       <table id="dbDataTable"><thead id="dbDataThead"></thead><tbody id="dbDataTbody"></tbody></table>
+                    </div>
+                 </div>
+                 <div id="dbSchemaTab" class="hidden"><tbody id="dbSchemaTbody"></tbody></div>
+                 <div id="dbIndexesTab" class="hidden"><tbody id="dbIndexesTbody"></tbody></div>
+              </div>
+           </div>
         </div>
+      </div>
 
-      </aside>
-    </div>
-    </div><!-- end main-content -->
+      <!-- SETTINGS VIEW (Fully Restored) -->
+      <div class="settings-view hidden" id="settingsView">
+        <header class="settings-header">
+          <button class="settings-back-btn" id="settingsBackBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+          <h1 class="settings-title">Settings</h1>
+        </header>
+        <div class="settings-content">
+           
+           <section class="settings-section">
+              <h2 class="settings-section-title">API Keys</h2>
+              <div class="settings-field"><label>Anthropic API Key</label><input type="password" id="settingsAnthropicKey" class="settings-input"><button id="settingsAnthropicToggle" class="hidden">Show</button><span id="settingsAnthropicMasked"></span></div>
+              <div class="settings-field"><label>Composio API Key</label><input type="password" id="settingsComposioKey" class="settings-input"><button id="settingsComposioToggle" class="hidden">Show</button><span id="settingsComposioMasked"></span></div>
+              <div class="settings-field"><label>Smithery API Key</label><input type="password" id="settingsSmitheryKey" class="settings-input"><button id="settingsSmitheryToggle" class="hidden">Show</button><span id="settingsSmitheryMasked"></span></div>
+              <div class="settings-field"><label>Postiz API Key</label><input type="password" id="settingsPostizKey" class="settings-input"><button id="settingsPostizToggle" class="hidden">Show</button><span id="settingsPostizMasked"></span></div>
 
-    <!-- Right Sidebar Expand Button (visible when collapsed) -->
-    <button class="right-sidebar-expand-btn" id="rightSidebarExpand" title="Expand sidebar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="15 18 9 12 15 6"></polyline>
-      </svg>
-    </button>
+              <!-- DataForSEO (Hidden but restored) -->
+              <div class="hidden">
+                <input type="text" id="settingsDataforseoUsername"><button id="settingsDataforseoUsernameToggle"></button><span id="settingsDataforseoUsernameMasked"></span>
+                <input type="password" id="settingsDataforseoPassword"><button id="settingsDataforseoPasswordToggle"></button><span id="settingsDataforseoPasswordMasked"></span>
+              </div>
+
+              <button class="settings-save-btn" id="settingsSaveKeysBtn">Save Keys</button>
+              <p id="settingsKeysStatus"></p>
+           </section>
+
+           <section class="settings-section">
+              <h2 class="settings-section-title">MCP Servers</h2>
+              <div id="settingsMcpList"></div>
+              <button class="settings-add-mcp-btn" id="settingsAddMcpBtn">Add MCP Server</button>
+              <div id="settingsMcpForm" class="hidden settings-mcp-form">
+                 <h3 id="settingsMcpFormTitle">Add Server</h3>
+                 <input type="text" id="settingsMcpName" class="settings-input" placeholder="Name">
+                 <select id="settingsMcpType" class="settings-select"><option value="http">HTTP</option><option value="local">Local</option></select>
+                 <div id="settingsMcpHttpFields"><input type="text" id="settingsMcpUrl" class="settings-input" placeholder="URL"><input type="text" id="settingsMcpHeaders" class="settings-input" placeholder="Headers"></div>
+                 <div id="settingsMcpLocalFields" class="hidden"><input type="text" id="settingsMcpCommand" class="settings-input" placeholder="Command"><input type="text" id="settingsMcpArgs" class="settings-input" placeholder="Args"></div>
+                 <div class="settings-mcp-form-actions">
+                    <button id="settingsMcpCancelBtn" class="settings-mcp-cancel-btn">Cancel</button>
+                    <button id="settingsMcpSaveBtn" class="settings-mcp-save-btn">Save</button>
+                 </div>
+              </div>
+              <p id="settingsMcpStatus"></p>
+           </section>
+
+           <section class="settings-section">
+              <h2 class="settings-section-title">Browser Automation</h2>
+              <div class="settings-field"><label><input type="checkbox" id="settingsBrowserEnabled"> Enable</label></div>
+              <div id="settingsBrowserOptions" class="hidden">
+                 <select id="settingsBrowserBackend" class="settings-select"><option value="builtin">Built-in</option></select>
+                 <div id="settingsAgentBrowserHint"></div>
+                 <div id="settingsBrowserBuiltinOptions">
+                    <select id="settingsBrowserMode" class="settings-select"><option value="chrome">Chrome</option></select>
+                    <div id="settingsCdpPortField"><input type="number" id="settingsBrowserCdpPort" class="settings-input"></div>
+                    <label><input type="checkbox" id="settingsBrowserHeadless"> Headless</label>
+                 </div>
+              </div>
+              <button class="settings-save-btn" id="settingsSaveBrowserBtn">Save</button>
+              <p id="settingsBrowserStatus"></p>
+           </section>
+
+           <section class="settings-section">
+              <h2 class="settings-section-title">Instructions & Permissions</h2>
+              <div class="settings-field"><label>Global Instructions</label><textarea id="settingsGlobalInstructions" class="settings-textarea"></textarea></div>
+              <div id="settingsFolderInstructionsList"></div>
+              <button id="settingsAddFolderInstructionBtn" class="settings-add-btn">+ Folder Instruction</button>
+              
+              <div id="settingsFolderInstructionForm" class="hidden">
+                 <input type="text" id="settingsFolderPath">
+                 <textarea id="settingsFolderInstructionsText"></textarea>
+                 <button id="settingsFolderInstructionSaveBtn">Save</button>
+                 <button id="settingsFolderInstructionCancelBtn">Cancel</button>
+              </div>
+
+              <div class="settings-field">
+                 <label>Permission Mode</label>
+                 <select id="settingsPermissionMode" class="settings-select">
+                    <option value="bypassPermissions">Full Auto</option>
+                    <option value="default">Strict</option>
+                 </select>
+              </div>
+              <div id="settingsAllowedDirectoriesList"></div>
+              <input type="text" id="settingsNewDirectoryPath">
+              <button id="settingsAddDirectoryBtn">Add</button>
+              <label><input type="checkbox" id="settingsFileDeleteConfirmation"> Confirm Deletes</label>
+              
+              <button class="settings-save-btn" id="settingsSaveInstructionsBtn">Save Instructions</button>
+              <button class="settings-save-btn" id="settingsSavePermissionsBtn">Save Permissions</button>
+              <p id="settingsInstructionsStatus"></p>
+              <p id="settingsPermissionsStatus"></p>
+           </section>
+           
+           <!-- Hidden but restored -->
+           <div class="hidden">
+              <input type="text" id="settingsDocOutputDir">
+              <button id="settingsSaveDocumentsBtn"></button>
+              <p id="settingsDocumentsStatus"></p>
+              <input type="text" id="settingsPluginUrl">
+              <button id="settingsInstallPluginBtn"></button>
+              <p id="settingsPluginsStatus"></p>
+              <div id="settingsPluginsList"></div>
+              <div id="settingsAccountSection"><div id="settingsUserInfo"></div><button id="settingsSignOutBtn"></button></div>
+           </div>
+        </div>
+      </div>
+
+      <!-- VAULT VIEW -->
+      <div class="vault-view hidden" id="vaultView">
+         <header class="vault-header">
+           <button class="vault-back-btn hidden" id="vaultBackBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+           <h1 class="vault-title">Vault</h1>
+           <button class="settings-save-btn" id="vaultUploadBtn">Upload</button>
+           <input type="file" id="vaultFileInput" hidden multiple>
+         </header>
+         <div class="vault-content">
+            <div id="vaultBreadcrumbs"></div>
+            <div style="display:flex; gap:8px; margin-bottom:16px;">
+               <select id="vaultSourceFilter" class="settings-select" style="width:auto;"></select>
+               <select id="vaultSortSelect" class="settings-select" style="width:auto;"></select>
+               <button id="vaultViewToggle" class="control-btn"></button>
+            </div>
+            <div id="vaultGrid" class="quick-actions-grid"></div>
+            <div id="vaultContent"></div>
+            <div id="vaultUnavailable" class="hidden"></div>
+            <div id="vaultEmpty" class="hidden"></div>
+         </div>
+      </div>
+
+      <!-- REPORTS VIEW -->
+      <div class="reports-view hidden" id="reportsView">
+         <header class="reports-header">
+            <button class="reports-back-btn hidden" id="reportsBackBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+            <h1 class="reports-title">Reports</h1>
+            <button class="settings-save-btn" id="reportsNewBtn">New</button>
+         </header>
+         <div class="reports-content">
+            <div id="reportsListView">
+               <div id="reportSummaryCards">
+                  <div id="reportStatChats"></div><div id="reportStatMessages"></div><div id="reportStatDays"></div><div id="reportStatAvg"></div>
+               </div>
+               <div id="savedReportsList"></div>
+            </div>
+            <div id="reportsBuilderView" class="hidden">
+               <input type="text" id="builderReportName">
+               <select id="builderSource"></select>
+               <select id="builderDays"></select>
+               <select id="builderGroupBy"></select>
+               <select id="builderChartType"></select>
+               <button id="builderRunBtn"></button>
+               <button id="builderSaveBtn"></button>
+               <div id="reportBuilderPreview">
+                  <div id="reportChartContainer"><canvas id="reportChart"></canvas></div>
+                  <div id="reportTableContainer"><table id="reportDataTable"><thead id="reportDataThead"></thead><tbody id="reportDataTbody"></tbody></table></div>
+                  <div id="reportNoData"></div>
+               </div>
+            </div>
+            <div id="reportsUnavailable" class="hidden"></div>
+         </div>
+      </div>
+
+    </main>
   </div>
 
+  <!-- Dialogs -->
+  <div class="permission-dialog-overlay hidden" id="permissionDialogOverlay">
+     <div id="permissionToolName"></div>
+     <div id="permissionToolInput"></div>
+     <button id="permissionAllowBtn">Allow</button>
+     <button id="permissionDenyBtn">Deny</button>
+  </div>
+  <div class="command-palette-overlay hidden" id="commandPalette">
+     <input type="text" id="commandPaletteInput">
+     <div id="commandPaletteResults"></div>
+  </div>
+
+  <script src="db-explorer.js"></script>
   <script src="renderer.js"></script>
 </body>
 </html>

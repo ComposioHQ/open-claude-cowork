@@ -33,8 +33,8 @@
 <p align="center">
   <i>Pst. hey, you, join our stargazers :)</i>
   <br>
-  <a href="https://github.com/ComposioHQ/open-claude-cowork">
-    <img src="https://img.shields.io/github/stars/ComposioHQ/open-claude-cowork.svg?style=social&label=Star&maxAge=2592000" alt="GitHub stars">
+  <a href="https://github.com/ignitabull18/open-claude-cowork">
+    <img src="https://img.shields.io/github/stars/ignitabull18/open-claude-cowork.svg?style=social&label=Star&maxAge=2592000" alt="GitHub stars">
   </a>
 </p>
 
@@ -59,18 +59,54 @@ Both include **500+ app integrations** via Composio (Gmail, Slack, GitHub, Googl
 ### Open Claude Cowork
 
 ```bash
-git clone https://github.com/ComposioHQ/open-claude-cowork.git
+git clone https://github.com/ignitabull18/open-claude-cowork.git
 cd open-claude-cowork
 ./setup.sh
 ```
 
-Then run in two terminals:
+Run from the repo root:
+
+```bash
+npm run start:all
+```
+
+Or in two terminals (legacy flow):
 ```bash
 # Terminal 1
 cd server && npm start
 
 # Terminal 2
 npm start
+```
+
+### End-to-end Testing
+
+```bash
+npm run test:e2e:smoke-matrix
+npm run test:e2e:critical-matrix
+```
+
+`test:e2e:smoke-matrix`
+- Full smoke suite (`tests/smoke.spec.js`) across Chromium, Firefox, WebKit, Mobile Chrome, and Mobile Safari.
+
+`test:e2e:critical-matrix`
+- Critical user journey suite (`tests/critical-user-journeys.spec.js`) across Chromium, Firefox, WebKit, Mobile Chrome, and Mobile Safari.
+
+`test:e2e:matrix`
+- Everything (`smoke + critical`) across the same 5 browser/device targets.
+
+`test:e2e:ci`
+- Same full matrix with retry behavior suitable for CI.
+
+CI-friendly report output is written to:
+- `output/playwright/report`
+- `output/playwright/reports/results.json`
+- `output/playwright/reports/junit.xml`
+- `output/playwright/artifacts` (videos/traces/screenshots on failures)
+
+Quick pre-merge command:
+```bash
+npm run test:e2e:critical && npm run test:e2e:smoke
 ```
 
 ### 🦑 Secure Clawdbot
@@ -90,7 +126,7 @@ See [Secure Clawdbot Documentation](./clawd/README.md) for full setup.
 ## Features
 
 ### Open Claude Cowork
-- **Multi-Provider Support** - Claude Agent SDK or Opencode for different models
+- **AI Provider** - Claude Agent SDK
 - **Persistent Sessions** - Context maintained across messages
 - **Real-time Streaming** - Token-by-token response display
 - **Tool Visualization** - See tool inputs/outputs in the sidebar
@@ -112,7 +148,7 @@ See [Secure Clawdbot Documentation](./clawd/README.md) for full setup.
 |-----------|------------|
 | Desktop | Electron.js |
 | Backend | Node.js + Express |
-| AI | Claude Agent SDK + Opencode SDK |
+| AI | Claude Agent SDK |
 | Tools | Composio Tool Router + MCP |
 | Streaming | Server-Sent Events (SSE) |
 
@@ -125,7 +161,7 @@ See [Secure Clawdbot Documentation](./clawd/README.md) for full setup.
 You need:
 - **Anthropic API key** from [console.anthropic.com](https://console.anthropic.com)
 - **Composio API key** from [app.composio.dev](https://app.composio.dev)
-- **Opencode API key** (optional) from [opencode.dev](https://opencode.dev)
+- **OpenAI API key** (optional) from [platform.openai.com](https://platform.openai.com) for memory/search
 
 ```bash
 cp .env.example .env
@@ -157,7 +193,7 @@ open-claude-cowork/
 ├── main.js              # Electron main process
 ├── renderer/            # Frontend UI
 ├── server/              # Backend + providers
-│   ├── providers/       # Claude & Opencode implementations
+│   ├── providers/       # Claude implementation
 │   └── server.js        # Express server
 ├── clawd/               # Secure Clawdbot (messaging bot)
 │   ├── cli.js           # Entry point

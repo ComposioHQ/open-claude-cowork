@@ -5,20 +5,47 @@
   "scripts": {
     "dev": "NODE_ENV=development electron .",
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:server": "cd server && node server.js",
+    "start:all": "node scripts/start-all.js",
+    "cleanup:test-users": "bash scripts/cleanup-autotest-users.sh",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:server": "vitest run tests/unit/server tests/integration/server",
+    "test:renderer": "vitest run tests/unit/renderer tests/unit/electron",
+    "test:e2e": "playwright test",
+    "test:e2e:matrix": "playwright test --project=chromium --project=firefox --project=webkit --project='Mobile Chrome' --project='Mobile Safari'",
+    "test:e2e:smoke-matrix": "playwright test tests/smoke.spec.js --project=chromium --project=firefox --project=webkit --project='Mobile Chrome' --project='Mobile Safari'",
+    "test:e2e:critical-matrix": "playwright test tests/critical-user-journeys.spec.js --project=chromium --project=firefox --project=webkit --project='Mobile Chrome' --project='Mobile Safari'",
+    "test:e2e:critical": "playwright test tests/critical-user-journeys.spec.js",
+    "test:e2e:ci": "playwright test --project=chromium --project=firefox --project=webkit --project='Mobile Chrome' --project='Mobile Safari' --retries=2",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:smoke": "playwright test tests/smoke.spec.js",
+    "test:e2e:workflow": "node scripts/e2e-signin-and-workflow.js",
+    "schedule:workflows": "node scripts/schedule-workflows.js",
+    "test:scheduled": "node scripts/test-scheduled-run.js",
+    "cleanup:e2e:workflows": "node scripts/cleanup-e2e-workflows.js"
   },
   "author": "",
   "license": "ISC",
-  "description": "Electron chat app with Claude Agent SDK and Opencode SDK support",
+  "description": "Electron chat app with Claude Agent SDK support",
   "dependencies": {
-    "@anthropic-ai/claude-agent-sdk": "^0.2.7",
-    "@opencode-ai/sdk": "latest",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^5.2.1"
+    "@anthropic-ai/claude-agent-sdk": "0.2.7",
+    "cors": "2.8.5",
+    "dotenv": "16.4.5",
+    "express": "5.2.1"
   },
   "devDependencies": {
-    "electron": "^39.2.7",
-    "electron-reload": "^2.0.0-alpha.1"
+    "@playwright/test": "1.58.2",
+    "@vitest/coverage-v8": "4.0.18",
+    "electron": "39.2.7",
+    "electron-reload": "2.0.0-alpha.1",
+    "happy-dom": "20.6.1",
+    "jsonwebtoken": "9.0.3",
+    "msw": "2.12.10",
+    "supertest": "7.2.2",
+    "vitest": "4.0.18"
   }
 }

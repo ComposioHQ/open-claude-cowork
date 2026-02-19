@@ -1,0 +1,284 @@
+- generic [active] [ref=e1]:
+  - generic:
+    - generic [ref=e271]:
+      - img [ref=e273]
+      - generic [ref=e274]:
+        - generic [ref=e275]: Love Coolify? Support our work.
+        - generic [ref=e276]:
+          - text: We are already profitable thanks to YOU but...
+          - text: We would like to make more cool features.
+        - generic [ref=e277]: For this we need your help to support our work financially.
+      - generic [ref=e278]:
+        - button "GitHub Sponsors" [ref=e279] [cursor=pointer]:
+          - link "GitHub Sponsors" [ref=e280]:
+            - /url: https://github.com/sponsors/coollabsio
+        - button "Open Collective" [ref=e281] [cursor=pointer]:
+          - link "Open Collective" [ref=e282]:
+            - /url: https://opencollective.com/coollabsio/donate?interval=month&amount=10&name=&legalName=&email=
+        - button "Stripe" [ref=e283] [cursor=pointer]:
+          - link "Stripe" [ref=e284]:
+            - /url: https://donate.stripe.com/8x2bJ104ifmB9kB45u38402
+        - generic [ref=e285] [cursor=pointer]: Maybe next time
+    - generic [ref=e287]:
+      - generic [ref=e288]:
+        - img [ref=e290]
+        - generic [ref=e292]:
+          - heading "No notifications enabled." [level=4] [ref=e293]
+          - paragraph [ref=e294]:
+            - text: It is highly recommended to enable at least one notification channel to receive important alerts.
+            - text: Visit
+            - link "/notification" [ref=e295] [cursor=pointer]:
+              - /url: https://coolify2.ignitabull.org/notifications/email
+            - text: to enable notifications.
+      - button "Accept and Close" [ref=e296]
+  - button "1 deployment" [ref=e4]:
+    - img [ref=e5]
+    - generic [ref=e7]: 1 deployment
+    - img [ref=e8]
+  - generic [ref=e10]:
+    - navigation [ref=e13]:
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - link "Coolify" [ref=e16] [cursor=pointer]:
+            - /url: /
+          - link "v4.0.0-beta.463" [ref=e17] [cursor=pointer]:
+            - /url: https://github.com/coollabsio/coolify/releases/tag/v4.0.0-beta.463
+        - button / [ref=e19]:
+          - img [ref=e20]
+          - generic [ref=e22]: /
+        - button "Preferences 9+" [ref=e25] [cursor=pointer]:
+          - img "Preferences" [ref=e26]
+          - generic [ref=e28]: 9+
+      - combobox [ref=e31]:
+        - option "Switch team" [disabled]
+        - option "Root Team" [selected]
+      - list [ref=e32]:
+        - listitem [ref=e33]:
+          - list [ref=e34]:
+            - listitem [ref=e35]:
+              - link "Dashboard" [ref=e36] [cursor=pointer]:
+                - /url: /
+                - img [ref=e37]
+                - generic [ref=e39]: Dashboard
+            - listitem [ref=e40]:
+              - link "Projects" [ref=e41] [cursor=pointer]:
+                - /url: /projects
+                - img [ref=e42]
+                - generic [ref=e47]: Projects
+            - listitem [ref=e48]:
+              - link "Servers" [ref=e49] [cursor=pointer]:
+                - /url: /servers
+                - img [ref=e50]
+                - generic [ref=e55]: Servers
+            - listitem [ref=e56]:
+              - link "Sources" [ref=e57] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/sources
+                - img [ref=e58]
+                - generic [ref=e60]: Sources
+            - listitem [ref=e61]:
+              - link "Destinations" [ref=e62] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/destinations
+                - img [ref=e63]
+                - generic [ref=e65]: Destinations
+            - listitem [ref=e66]:
+              - link "S3 Storages" [ref=e67] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/storages
+                - img [ref=e68]
+                - generic [ref=e73]: S3 Storages
+            - listitem [ref=e74]:
+              - link "Shared Variables" [ref=e75] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/shared-variables
+                - img [ref=e76]
+                - generic [ref=e80]: Shared Variables
+            - listitem [ref=e81]:
+              - link "Notifications" [ref=e82] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/notifications/email
+                - img [ref=e83]
+                - generic [ref=e85]: Notifications
+            - listitem [ref=e86]:
+              - link "Keys & Tokens" [ref=e87] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/security/private-key
+                - img [ref=e88]
+                - generic [ref=e90]: Keys & Tokens
+            - listitem [ref=e91]:
+              - link "Tags" [ref=e92] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/tags
+                - img [ref=e93]
+                - generic [ref=e97]: Tags
+            - listitem [ref=e98]:
+              - link "Terminal" [ref=e99] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/terminal
+                - img [ref=e100]
+                - generic [ref=e103]: Terminal
+            - listitem [ref=e104]:
+              - link "Profile" [ref=e105] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/profile
+                - img [ref=e106]
+                - generic [ref=e111]: Profile
+            - listitem [ref=e112]:
+              - link "Teams" [ref=e113] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/team
+                - img [ref=e114]
+                - generic [ref=e122]: Teams
+            - listitem [ref=e123]:
+              - link "Settings" [ref=e124] [cursor=pointer]:
+                - /url: /settings
+                - img [ref=e125]
+                - generic [ref=e129]: Settings
+            - generic:
+              - listitem:
+                - generic "No upgrade available"
+            - listitem [ref=e130]:
+              - link "Sponsor us" [ref=e131] [cursor=pointer]:
+                - /url: https://coolify.io/sponsorships
+                - img [ref=e132]
+                - generic [ref=e136]: Sponsor us
+            - listitem [ref=e137]:
+              - generic "Send us feedback or get help!" [ref=e140] [cursor=pointer]:
+                - img [ref=e141]
+                - generic [ref=e143]: Feedback
+            - listitem [ref=e144]:
+              - button "Logout" [ref=e146]:
+                - img [ref=e147]
+                - generic [ref=e149]: Logout
+    - main [ref=e150]:
+      - generic [ref=e152]:
+        - heading "Deployment" [level=1] [ref=e153]
+        - generic [ref=e155]:
+          - generic [ref=e156]:
+            - img [ref=e157]
+            - generic [ref=e159]:
+              - heading "The latest configuration has not been applied" [level=4] [ref=e160]
+              - generic [ref=e161]: Please redeploy to apply the new configuration.
+          - button [ref=e162]:
+            - img [ref=e163]
+        - navigation [ref=e165]:
+          - navigation [ref=e166]:
+            - list [ref=e167]:
+              - listitem [ref=e168]:
+                - generic [ref=e169]:
+                  - link "Cowork" [ref=e170] [cursor=pointer]:
+                    - /url: https://coolify2.ignitabull.org/project/ugs8ook44ko4c8oc8k0ssso0
+                  - button [ref=e171]:
+                    - img [ref=e172]
+              - listitem [ref=e174]:
+                - generic [ref=e175]:
+                  - link "production" [ref=e176] [cursor=pointer]:
+                    - /url: https://coolify2.ignitabull.org/project/ugs8ook44ko4c8oc8k0ssso0/environment/t4sg0cwwo0gcgk0g4wowwgkw
+                  - button [ref=e177]:
+                    - img [ref=e178]
+              - listitem [ref=e180]:
+                - generic [ref=e181]:
+                  - link "open-claude-cowork (localhost)" [ref=e182] [cursor=pointer]:
+                    - /url: https://coolify2.ignitabull.org/project/ugs8ook44ko4c8oc8k0ssso0/environment/t4sg0cwwo0gcgk0g4wowwgkw/application/y4wkoooowsw040g80gwwogkw
+                  - button [ref=e183]:
+                    - img [ref=e184]
+              - generic [ref=e186]:
+                - link "Running" [ref=e189] [cursor=pointer]:
+                  - /url: https://github.com/ignitabull18/open-claude-cowork/commit/45eafdf08994c796ecbac17bce9e061c2e8e4dc8
+                - generic [ref=e190]: (healthy)
+              - button "Refresh Status" [ref=e191]:
+                - img [ref=e192]
+          - generic [ref=e194]:
+            - navigation [ref=e195]:
+              - link "Configuration" [ref=e196] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/project/ugs8ook44ko4c8oc8k0ssso0/environment/t4sg0cwwo0gcgk0g4wowwgkw/application/y4wkoooowsw040g80gwwogkw
+              - link "Deployments" [ref=e197] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/project/ugs8ook44ko4c8oc8k0ssso0/environment/t4sg0cwwo0gcgk0g4wowwgkw/application/y4wkoooowsw040g80gwwogkw/deployment
+              - link "Logs" [ref=e198] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/project/ugs8ook44ko4c8oc8k0ssso0/environment/t4sg0cwwo0gcgk0g4wowwgkw/application/y4wkoooowsw040g80gwwogkw/logs
+                - generic [ref=e199]: Logs
+              - link "Terminal" [ref=e200] [cursor=pointer]:
+                - /url: https://coolify2.ignitabull.org/project/ugs8ook44ko4c8oc8k0ssso0/environment/t4sg0cwwo0gcgk0g4wowwgkw/application/y4wkoooowsw040g80gwwogkw/terminal
+              - button "Links" [ref=e202]:
+                - generic [ref=e203]: Links
+                - img [ref=e204]
+            - generic [ref=e206]:
+              - button "Advanced" [ref=e209]:
+                - generic [ref=e210]: Advanced
+                - img [ref=e211]
+              - generic [ref=e213]:
+                - button "Redeploy" [ref=e214] [cursor=pointer]:
+                  - img [ref=e215]
+                  - text: Redeploy
+                - button "Restart" [ref=e217] [cursor=pointer]:
+                  - img [ref=e218]
+                  - text: Restart
+                - button "Stop" [ref=e223] [cursor=pointer]:
+                  - img [ref=e224]
+                  - text: Stop
+        - generic [ref=e226]:
+          - generic [ref=e227]:
+            - heading "Deployment Log" [level=2] [ref=e228]
+            - button "Cancel" [ref=e229] [cursor=pointer]
+          - generic [ref=e231]:
+            - generic [ref=e232]:
+              - generic [ref=e234]:
+                - generic [ref=e235]: Deployment is
+                - generic [ref=e236]: In Progress
+                - img [ref=e238]
+              - generic [ref=e240]:
+                - generic [ref=e241]:
+                  - img [ref=e242]
+                  - textbox "Find in logs" [ref=e244]
+                - generic [ref=e245]:
+                  - button "Copy Logs" [ref=e246]:
+                    - img [ref=e247]
+                  - button "Download Logs" [ref=e250]:
+                    - img [ref=e251]
+                  - button "Toggle Timestamps" [ref=e253]:
+                    - img [ref=e254]
+                  - button "Show Debug Logs" [ref=e256]:
+                    - img [ref=e257]
+                  - button "Follow Logs" [ref=e259]:
+                    - img [ref=e260]
+                  - button "Fullscreen" [ref=e262]:
+                    - img [ref=e263]
+            - generic [ref=e268]:
+              - generic [ref=e297]:
+                - generic [ref=e298]: 2026-Feb-16 21:59:26.033361
+                - generic [ref=e299]: Starting deployment of ignitabull18/open-claude-cowork:master to localhost.
+              - generic [ref=e300]:
+                - generic [ref=e301]: 2026-Feb-16 21:59:26.797760
+                - generic [ref=e302]: "Preparing container with helper image: ghcr.io/coollabsio/coolify-helper:1.0.12"
+              - generic [ref=e303]:
+                - generic [ref=e304]: 2026-Feb-16 21:59:29.130636
+                - generic [ref=e305]: "----------------------------------------"
+              - generic [ref=e306]:
+                - generic [ref=e307]: 2026-Feb-16 21:59:29.141370
+                - generic [ref=e308]: Importing ignitabull18/open-claude-cowork:master (commit sha 45eafdf08994c796ecbac17bce9e061c2e8e4dc8) to /artifacts/q80oggg00c80kogs88koo4ow.
+              - generic [ref=e309]:
+                - generic [ref=e310]: 2026-Feb-16 21:59:33.344762
+                - generic [ref=e311]: Configuration changed. Rebuilding image.
+              - generic [ref=e312]:
+                - generic [ref=e313]: 2026-Feb-16 21:59:37.556532
+                - generic [ref=e314]: "----------------------------------------"
+              - generic [ref=e315]:
+                - generic [ref=e316]: 2026-Feb-16 21:59:37.567332
+                - generic [ref=e317]: Building docker image started.
+              - generic [ref=e318]:
+                - generic [ref=e319]: 2026-Feb-16 21:59:37.579981
+                - generic [ref=e320]: To check the current progress, click on Show Debug Logs.
+              - generic [ref=e321]:
+                - generic [ref=e322]: 2026-Feb-16 21:59:49.889322
+                - generic [ref=e323]: Building docker image completed.
+              - generic [ref=e324]:
+                - generic [ref=e325]: 2026-Feb-16 21:59:50.727246
+                - generic [ref=e326]: "----------------------------------------"
+              - generic [ref=e327]:
+                - generic [ref=e328]: 2026-Feb-16 21:59:50.736105
+                - generic [ref=e329]: Rolling update started.
+              - generic [ref=e330]:
+                - generic [ref=e331]: 2026-Feb-16 21:59:52.234056
+                - generic [ref=e332]: New container started.
+              - generic [ref=e333]:
+                - generic [ref=e334]: 2026-Feb-16 21:59:52.248519
+                - generic [ref=e335]: Custom healthcheck found in Dockerfile.
+              - generic [ref=e336]:
+                - generic [ref=e337]: 2026-Feb-16 21:59:52.262412
+                - generic [ref=e338]: Waiting for healthcheck to pass on the new container.
+              - generic [ref=e339]:
+                - generic [ref=e340]: 2026-Feb-16 21:59:52.276454
+                - generic [ref=e341]: Waiting for the start period (10 seconds) before starting healthcheck.
+  - img
+  - list

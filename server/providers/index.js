@@ -1,11 +1,7 @@
 import { ClaudeProvider } from './claude-provider.js';
-import { OpencodeProvider } from './opencode-provider.js';
 
 // Provider registry
-const providers = {
-  claude: ClaudeProvider,
-  opencode: OpencodeProvider
-};
+const providers = { claude: ClaudeProvider };
 
 // Provider instance cache
 const providerInstances = new Map();
@@ -14,7 +10,7 @@ const providerInstances = new Map();
  * Get a provider instance by name
  * Instances are cached and reused
  *
- * @param {string} providerName - 'claude' or 'opencode'
+ * @param {string} providerName - 'claude'
  * @param {Object} [config] - Provider configuration
  * @returns {BaseProvider} Provider instance
  */
@@ -71,10 +67,11 @@ export async function clearProviderCache() {
 export async function initializeProviders() {
   console.log('[Providers] Initializing providers...');
   try {
-    // Get and initialize opencode provider
-    const opencodeProvider = getProvider('opencode');
-    await opencodeProvider.initialize();
-    console.log('[Providers] Opencode provider initialized');
+    const claudeProvider = getProvider('claude');
+    if (typeof claudeProvider.initialize === 'function') {
+      await claudeProvider.initialize();
+    }
+    console.log('[Providers] Claude provider initialized');
   } catch (error) {
     console.error('[Providers] Error initializing providers:', error.message);
   }
@@ -82,5 +79,4 @@ export async function initializeProviders() {
 
 // Export classes for direct use
 export { ClaudeProvider } from './claude-provider.js';
-export { OpencodeProvider } from './opencode-provider.js';
 export { BaseProvider } from './base-provider.js';

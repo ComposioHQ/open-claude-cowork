@@ -1,0 +1,2 @@
+This is a test file for the Assets Vault feature.
+Created during testing on 2026-02-14.

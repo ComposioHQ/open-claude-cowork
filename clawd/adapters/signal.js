@@ -111,8 +111,7 @@ export default class SignalAdapter extends BaseAdapter {
     const dataMessage = envelope.dataMessage
     if (!dataMessage) return
 
-    const text = dataMessage.message || ''
-    if (!text) return
+    let text = dataMessage.message || dataMessage.body || dataMessage.caption || ''
 
     const isGroup = !!dataMessage.groupInfo
     const chatId = isGroup
@@ -120,6 +119,36 @@ export default class SignalAdapter extends BaseAdapter {
       : envelope.source
 
     const sender = envelope.source
+
+    // Try to extract image attachment metadata sent with Signal
+    let image = null
+    const attachments = Array.isArray(dataMessage.attachments) ? dataMessage.attachments : []
+    const imageAttachment = attachments.find(att => {
+      const type = String(att?.contentType || att?.content_type || '').toLowerCase()
+      return type.startsWith('image/')
+    })
+
+    if (imageAttachment) {
+      const attachmentData =
+        imageAttachment.data ||
+        imageAttachment.preview ||
+        imageAttachment.imageData ||
+        imageAttachment.thumbnail;
+
+      const mediaType = imageAttachment.mediaType || imageAttachment.contentType || imageAttachment.content_type || 'image/jpeg'
+      if (attachmentData) {
+        image = {
+          data: attachmentData,
+          mediaType
+        }
+          console.log('[Signal] Image attachment detected, bytes:', attachmentData.length || 0)
+      } else {
+        console.log('[Signal] Image attachment metadata present but no inline data available in payload');
+      }
+    }
+
+    if (!text && !image) return
+    if (!text && image) text = '[Image]'
 
     // Check for mentions
     const mentions = dataMessage.mentions || []
@@ -131,7 +160,7 @@ export default class SignalAdapter extends BaseAdapter {
       isGroup,
       sender,
       mentions: isMentioned ? ['self'] : [],
-      image: null, // TODO: Handle attachments
+      image,
       raw: envelope
     }
 

@@ -1,0 +1,33 @@
+# Dependencies and dev
+node_modules
+**/node_modules
+.coolpack
+
+# Git and env
+.git
+.gitignore
+.env
+.env.*
+
+# Desktop / local-only
+clawd
+main.js
+preload.js
+package.json
+package-lock.json
+setup.sh
+scripts
+.claude
+assets
+*.gif
+*.png
+.cursor
+*.md
+!server/README.md
+
+# Tests
+tests
+vitest.config.js
+playwright.config.js
+docker-compose.yml
+CLAUDE.md
