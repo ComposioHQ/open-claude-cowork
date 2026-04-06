@@ -5,14 +5,19 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
-    "express": "^5.2.1",
     "@anthropic-ai/claude-agent-sdk": "^0.2.7",
     "@composio/core": "latest",
     "@opencode-ai/sdk": "latest",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "cors": "^2.8.5"
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.9"
   }
 }

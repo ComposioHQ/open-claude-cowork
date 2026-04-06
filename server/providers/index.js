@@ -1,10 +1,12 @@
 import { ClaudeProvider } from './claude-provider.js';
 import { OpencodeProvider } from './opencode-provider.js';
+import { MiniMaxProvider } from './minimax-provider.js';
 
 // Provider registry
 const providers = {
   claude: ClaudeProvider,
-  opencode: OpencodeProvider
+  opencode: OpencodeProvider,
+  minimax: MiniMaxProvider
 };
 
 // Provider instance cache
@@ -83,4 +85,5 @@ export async function initializeProviders() {
 // Export classes for direct use
 export { ClaudeProvider } from './claude-provider.js';
 export { OpencodeProvider } from './opencode-provider.js';
+export { MiniMaxProvider } from './minimax-provider.js';
 export { BaseProvider } from './base-provider.js';
