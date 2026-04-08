@@ -54,6 +54,11 @@ const providerModels = {
     { value: 'claude-sonnet-4-5-20250514', label: 'Sonnet 4.5', desc: 'Best for everyday tasks', default: true },
     { value: 'claude-haiku-4-5-20250514', label: 'Haiku 4.5', desc: 'Fastest for quick answers' }
   ],
+  'claude-vertex': [
+    { value: 'claude-opus-4-5-20250514', label: 'Opus 4.5', desc: 'Most capable for complex work' },
+    { value: 'claude-sonnet-4-5-20250514', label: 'Sonnet 4.5', desc: 'Best for everyday tasks', default: true },
+    { value: 'claude-haiku-4-5-20250514', label: 'Haiku 4.5', desc: 'Fastest for quick answers' }
+  ],
   opencode: [
     // Opencode Zen (Free)
     { value: 'opencode/big-pickle', label: 'Big Pickle', desc: 'Reasoning model', default: true },
@@ -173,7 +178,12 @@ function loadAllChats() {
 
 // Update provider UI across all dropdowns
 function updateProviderUI(provider) {
-  const providerLabel = provider === 'claude' ? 'Claude' : 'Opencode';
+  const providerLabels = {
+    'claude': 'Claude',
+    'claude-vertex': 'Claude (Vertex AI)',
+    'opencode': 'Opencode'
+  };
+  const providerLabel = providerLabels[provider] || provider;
   document.querySelectorAll('.provider-selector .provider-label').forEach(l => {
     l.textContent = providerLabel;
   });

@@ -1,9 +1,11 @@
 import { ClaudeProvider } from './claude-provider.js';
+import { ClaudeVertexProvider } from './claude-vertex-provider.js';
 import { OpencodeProvider } from './opencode-provider.js';
 
 // Provider registry
 const providers = {
   claude: ClaudeProvider,
+  'claude-vertex': ClaudeVertexProvider,
   opencode: OpencodeProvider
 };
 
@@ -78,9 +80,18 @@ export async function initializeProviders() {
   } catch (error) {
     console.error('[Providers] Error initializing providers:', error.message);
   }
+  try {
+    // Get and initialize claude-vertex provider
+    const vertexProvider = getProvider('claude-vertex');
+    await vertexProvider.initialize();
+    console.log('[Providers] Claude Vertex provider initialized');
+  } catch (error) {
+    console.error('[Providers] Error initializing Claude Vertex provider:', error.message);
+  }
 }
 
 // Export classes for direct use
 export { ClaudeProvider } from './claude-provider.js';
+export { ClaudeVertexProvider } from './claude-vertex-provider.js';
 export { OpencodeProvider } from './opencode-provider.js';
 export { BaseProvider } from './base-provider.js';
