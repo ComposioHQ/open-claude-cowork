@@ -54,24 +54,72 @@ else
     echo ""
 fi
 
-# Prompt for Anthropic API key
-echo "API Key Configuration"
+# Prompt for Claude API configuration
+echo "Claude API Configuration"
 echo "------------------------"
 echo ""
-echo "You'll need an Anthropic API key from: https://console.anthropic.com"
+echo "Choose how to connect to Claude:"
+echo "  1) Anthropic API key (direct) - from https://console.anthropic.com"
+echo "  2) AWS Bedrock - use Claude through your AWS account"
 echo ""
-read -p "Enter your Anthropic API key (or press Enter to skip): " anthropic_key
+read -p "Enter your choice (1 or 2, or press Enter to skip): " claude_choice
 
-if [ ! -z "$anthropic_key" ]; then
-    # Update .env file with Anthropic key
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        sed -i '' "s/ANTHROPIC_API_KEY=.*/ANTHROPIC_API_KEY=$anthropic_key/" .env
-    else
-        sed -i "s/ANTHROPIC_API_KEY=.*/ANTHROPIC_API_KEY=$anthropic_key/" .env
+if [ "$claude_choice" = "1" ]; then
+    read -p "Enter your Anthropic API key: " anthropic_key
+    if [ ! -z "$anthropic_key" ]; then
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i '' "s/ANTHROPIC_API_KEY=.*/ANTHROPIC_API_KEY=$anthropic_key/" .env
+        else
+            sed -i "s/ANTHROPIC_API_KEY=.*/ANTHROPIC_API_KEY=$anthropic_key/" .env
+        fi
+        echo "Anthropic API key saved to .env"
     fi
-    echo "Anthropic API key saved to .env"
+elif [ "$claude_choice" = "2" ]; then
+    echo ""
+    echo "AWS Bedrock Configuration"
+    echo "Make sure Claude models are enabled in your AWS Bedrock console."
+    echo ""
+    read -p "Enter your AWS region (default: us-east-1): " aws_region
+    aws_region=${aws_region:-us-east-1}
+
+    echo ""
+    echo "Authentication method:"
+    echo "  1) AWS access keys (ACCESS_KEY_ID + SECRET_ACCESS_KEY)"
+    echo "  2) AWS profile name"
+    echo ""
+    read -p "Enter your choice (1 or 2): " auth_choice
+
+    # Enable Bedrock in .env
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' "s/# CLAUDE_CODE_USE_BEDROCK=1/CLAUDE_CODE_USE_BEDROCK=1/" .env
+        sed -i '' "s/# AWS_REGION=.*/AWS_REGION=$aws_region/" .env
+    else
+        sed -i "s/# CLAUDE_CODE_USE_BEDROCK=1/CLAUDE_CODE_USE_BEDROCK=1/" .env
+        sed -i "s/# AWS_REGION=.*/AWS_REGION=$aws_region/" .env
+    fi
+
+    if [ "$auth_choice" = "1" ]; then
+        read -p "Enter your AWS Access Key ID: " aws_key
+        read -p "Enter your AWS Secret Access Key: " aws_secret
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i '' "s/# AWS_ACCESS_KEY_ID=.*/AWS_ACCESS_KEY_ID=$aws_key/" .env
+            sed -i '' "s/# AWS_SECRET_ACCESS_KEY=.*/AWS_SECRET_ACCESS_KEY=$aws_secret/" .env
+        else
+            sed -i "s/# AWS_ACCESS_KEY_ID=.*/AWS_ACCESS_KEY_ID=$aws_key/" .env
+            sed -i "s/# AWS_SECRET_ACCESS_KEY=.*/AWS_SECRET_ACCESS_KEY=$aws_secret/" .env
+        fi
+        echo "AWS Bedrock credentials saved to .env"
+    elif [ "$auth_choice" = "2" ]; then
+        read -p "Enter your AWS profile name: " aws_profile
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i '' "s/# AWS_PROFILE=.*/AWS_PROFILE=$aws_profile/" .env
+        else
+            sed -i "s/# AWS_PROFILE=.*/AWS_PROFILE=$aws_profile/" .env
+        fi
+        echo "AWS Bedrock profile saved to .env"
+    fi
 else
-    echo "Skipped Anthropic API key. Please add it to .env manually."
+    echo "Skipped Claude API configuration. Please edit .env manually."
 fi
 echo ""
 

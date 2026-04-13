@@ -130,13 +130,44 @@ See [Secure Clawdbot Documentation](./clawd/README.md) for full setup.
 ### API Keys
 
 You need:
-- **Anthropic API key** from [console.anthropic.com](https://console.anthropic.com)
 - **Composio API key** from [app.composio.dev](https://app.composio.dev)
+- **One** of the following for Claude:
+  1. **Anthropic API key** from [console.anthropic.com](https://console.anthropic.com),
+  2. **AWS Bedrock** credentials (use Claude through your own AWS account)
 - **Opencode API key** (optional) from [opencode.dev](https://opencode.dev)
 
 ```bash
 cp .env.example .env
 # Edit .env with your keys
+```
+
+### Using AWS Bedrock (instead of Anthropic API key)
+
+If you prefer to use Claude through **AWS Bedrock** instead of a direct Anthropic API key, set these environment variables in your `.env`:
+
+```bash
+CLAUDE_CODE_USE_BEDROCK=1
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+```
+
+Or use an **AWS profile** instead of access keys:
+
+```bash
+CLAUDE_CODE_USE_BEDROCK=1
+AWS_REGION=us-east-1
+AWS_PROFILE=your-profile-name
+```
+
+> **Note:** Make sure Claude models are [enabled in your AWS Bedrock console](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) for your region before using this option.
+
+Optionally, pin specific model versions:
+
+```bash
+ANTHROPIC_DEFAULT_OPUS_MODEL=us.anthropic.claude-opus-4-6-v1
+ANTHROPIC_DEFAULT_SONNET_MODEL=us.anthropic.claude-sonnet-4-6
+ANTHROPIC_DEFAULT_HAIKU_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0
 ```
 
 ### Skills
@@ -180,7 +211,9 @@ open-claude-cowork/
 | Issue | Solution |
 |-------|----------|
 | Can't connect to backend | Ensure server is running on port 3001 |
-| API key error | Check `.env` - Anthropic keys start with `sk-ant-` |
+| Anthropic API key error | Check `.env` - Anthropic keys start with `sk-ant-` |
+| Bedrock auth error | Verify `CLAUDE_CODE_USE_BEDROCK=1` is set, AWS credentials are valid, and Claude models are enabled in your Bedrock console |
+| Bedrock region error | Ensure `AWS_REGION` is set to a region where Claude is available (e.g. `us-east-1`, `us-west-2`, `eu-west-1`) |
 | Session not persisting | Check server logs for session ID |
 | Streaming slow | Check firewall/network for SSE connections |
 
