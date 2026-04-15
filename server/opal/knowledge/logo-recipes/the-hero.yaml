@@ -1,0 +1,20 @@
+archetype: The Hero
+description: Courageous, bold, determined. Brands that inspire mastery and achievement.
+geometry: Angular
+visual_language:
+  - Strong diagonal lines
+  - Upward movement/ascension
+  - Shield or chevron motifs
+recipes:
+  - name: Rising Chevron
+    primitives: [polygon, polygon]
+    composition: Two stacked chevrons pointing upward, creating momentum and ascent
+    energy: Powerful, ascending
+  - name: Shield Construct
+    primitives: [polygon, line]
+    composition: Geometric shield built from triangles with internal division line
+    energy: Protective, strong
+  - name: Arrow Stack
+    primitives: [triangle, rectangle]
+    composition: Abstract arrow formed by triangle atop rectangle, suggesting forward movement
+    energy: Direct, purposeful

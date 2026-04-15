@@ -6,6 +6,7 @@ import fs from 'fs';
 import dotenv from 'dotenv';
 import { Composio } from '@composio/core';
 import { getProvider, getAvailableProviders, initializeProviders } from './providers/index.js';
+import { registerOpalRoutes } from './opal/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,14 +16,24 @@ dotenv.config({ path: path.join(__dirname, '..', '.env') });
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Initialize Composio
-const composio = new Composio();
+// Initialize Composio (non-fatal - OPAL pipeline works without it)
+let composio = null;
+try {
+  composio = new Composio();
+} catch (error) {
+  console.warn('[COMPOSIO] Composio initialization skipped:', error.message);
+  console.warn('[COMPOSIO] Chat with Composio tools will be unavailable. OPAL pipeline works independently.');
+}
 
 const composioSessions = new Map();
 let defaultComposioSession = null;
 
 // Pre-initialize Composio session on startup
 async function initializeComposioSession() {
+  if (!composio) {
+    console.log('[COMPOSIO] Skipping session init (Composio not available)');
+    return;
+  }
   const defaultUserId = 'default-user';
   console.log('[COMPOSIO] Pre-initializing session for:', defaultUserId);
   try {
@@ -56,6 +67,9 @@ function updateOpencodeConfig(mcpUrl, mcpHeaders) {
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve OPAL frontend as static files at /opal/
+app.use('/opal', express.static(path.join(__dirname, '..', 'opal')));
 
 // Chat endpoint using provider abstraction
 app.post('/api/chat', async (req, res) => {
@@ -103,31 +117,32 @@ app.post('/api/chat', async (req, res) => {
   });
 
   try {
-    // Get or create Composio session for this user
-    let composioSession = composioSessions.get(userId);
-    if (!composioSession) {
-      console.log('[COMPOSIO] Creating new session for user:', userId);
-      res.write(`data: ${JSON.stringify({ type: 'status', message: 'Initializing session...' })}\n\n`);
-      composioSession = await composio.create(userId);
-      composioSessions.set(userId, composioSession);
-      console.log('[COMPOSIO] Session created with MCP URL:', composioSession.mcp.url);
+    // Get or create Composio session for this user (if Composio is available)
+    let mcpServers = {};
+    if (composio) {
+      let composioSession = composioSessions.get(userId);
+      if (!composioSession) {
+        console.log('[COMPOSIO] Creating new session for user:', userId);
+        res.write(`data: ${JSON.stringify({ type: 'status', message: 'Initializing session...' })}\n\n`);
+        composioSession = await composio.create(userId);
+        composioSessions.set(userId, composioSession);
+        console.log('[COMPOSIO] Session created with MCP URL:', composioSession.mcp.url);
 
-      // Update opencode.json with the MCP config
-      updateOpencodeConfig(composioSession.mcp.url, composioSession.mcp.headers);
-      console.log('[OPENCODE] Updated opencode.json with MCP config');
+        // Update opencode.json with the MCP config
+        updateOpencodeConfig(composioSession.mcp.url, composioSession.mcp.headers);
+        console.log('[OPENCODE] Updated opencode.json with MCP config');
+      }
+      mcpServers = {
+        composio: {
+          type: 'http',
+          url: composioSession.mcp.url,
+          headers: composioSession.mcp.headers
+        }
+      };
     }
 
     // Get the provider instance
     const provider = getProvider(providerName);
-
-    // Build MCP servers config - passed to provider
-    const mcpServers = {
-      composio: {
-        type: 'http',
-        url: composioSession.mcp.url,
-        headers: composioSession.mcp.headers
-      }
-    };
 
     console.log('[CHAT] Using provider:', provider.name);
     console.log('[CHAT] All stored sessions:', Array.from(provider.sessions.entries()));
@@ -219,6 +234,9 @@ app.get('/api/health', (_req, res) => {
 
 await initializeProviders();
 await initializeComposioSession();
+
+// Initialize OPAL pipeline routes and database
+registerOpalRoutes(app);
 
 // Start server and keep reference to prevent garbage collection
 const server = app.listen(PORT, () => {

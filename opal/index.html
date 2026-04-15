@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OPAL Pipeline</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="opal-app">
+    <!-- Top Navigation Bar -->
+    <nav class="opal-topbar">
+      <div class="topbar-left">
+        <button class="nav-btn" id="backToChat" title="Back to Chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span>Chat</span>
+        </button>
+        <div class="topbar-divider"></div>
+        <h1 class="topbar-title">
+          <span class="opal-logo">OPAL</span>
+          <span class="opal-subtitle">Brand Intelligence Pipeline</span>
+        </h1>
+      </div>
+      <div class="topbar-right">
+        <span class="project-name" id="projectName">No project loaded</span>
+        <button class="nav-btn new-project-btn" id="newProjectBtn" title="New Project">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>New Project</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Layout: Sidebar + Content -->
+    <div class="opal-layout">
+      <!-- Pipeline Sidebar (Stage Stepper) -->
+      <aside class="pipeline-sidebar" id="pipelineSidebar">
+        <div class="sidebar-section">
+          <h3 class="sidebar-heading">Pipeline Stages</h3>
+          <div class="pipeline-stepper" id="pipelineStepper">
+            <!-- Populated by pipeline-view.js -->
+          </div>
+        </div>
+        <div class="sidebar-section sidebar-footer">
+          <div class="progress-summary" id="progressSummary">
+            <span class="progress-label">Progress</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <span class="progress-text" id="progressText">0 / 7</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Stage Content Area -->
+      <main class="stage-content" id="stageContent">
+        <!-- Welcome / Project Selection Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+          <div class="welcome-hero">
+            <h2>Welcome to OPAL</h2>
+            <p class="welcome-desc">Transform raw brand DNA into a complete brand system through a guided 7-stage intelligence pipeline.</p>
+            <button class="btn btn-primary btn-lg" id="welcomeNewProject">
+              Create New Project
+            </button>
+          </div>
+          <div class="project-list" id="projectList">
+            <!-- Existing projects rendered here -->
+          </div>
+        </div>
+
+        <!-- Stage Views (populated dynamically) -->
+        <div class="stage-view hidden" id="stageView">
+          <div class="stage-header" id="stageHeader">
+            <!-- Stage title and description -->
+          </div>
+          <div class="stage-body" id="stageBody">
+            <!-- Stage-specific content rendered here -->
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- New Project Modal -->
+    <div class="modal-overlay hidden" id="newProjectModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>New OPAL Project</h3>
+          <button class="modal-close" id="modalClose">&times;</button>
+        </div>
+        <div class="modal-body">
+          <label for="projectNameInput">Project Name</label>
+          <input type="text" id="projectNameInput" class="input" placeholder="e.g., Acme Corp Brand System" autofocus>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+          <button class="btn btn-primary" id="modalCreate">Create Project</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Browser API shim (replaces Electron preload.js) -->
+  <script src="browser-shim.js"></script>
+  <script type="module" src="opal.js"></script>
+</body>
+</html>

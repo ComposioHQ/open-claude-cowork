@@ -141,3 +141,6 @@ vite.config.ts.timestamp-*
 .vite/
 
 .DS_Store
+
+# OPAL project data (SQLite DB, user assets, exports)
+data/

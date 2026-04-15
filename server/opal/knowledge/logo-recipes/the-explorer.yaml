@@ -1,0 +1,20 @@
+archetype: The Explorer
+description: Freedom, discovery, adventure. Brands that value independence and new frontiers.
+geometry: Dynamic
+visual_language:
+  - Directional elements (arrows, paths)
+  - Open, expansive forms
+  - Compass or horizon references
+recipes:
+  - name: Compass Rose
+    primitives: [polygon, polygon, circle]
+    composition: Four-pointed star within a circle, rotated 45 degrees for dynamism
+    energy: Adventurous, oriented
+  - name: Horizon Line
+    primitives: [arc, line, circle]
+    composition: Curved horizon line with rising/setting circle above it
+    energy: Expansive, hopeful
+  - name: Path Fork
+    primitives: [line, line, line]
+    composition: Single line splitting into two divergent paths, suggesting choice and journey
+    energy: Curious, free

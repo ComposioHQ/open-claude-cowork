@@ -1,0 +1,20 @@
+archetype: The Sage
+description: Wisdom, knowledge, truth-seeking. Brands that value expertise and insight.
+geometry: Symmetric
+visual_language:
+  - Balanced, centered compositions
+  - Circles and concentric forms (unity, completeness)
+  - Clean lines suggesting clarity
+recipes:
+  - name: Nested Circles
+    primitives: [circle, circle, circle]
+    composition: Three concentric circles with strategic gap spacing creating a target/focus motif
+    energy: Calm, authoritative
+  - name: Open Book Abstraction
+    primitives: [rectangle, triangle, line]
+    composition: Two angled rectangles meeting at center creating an open-book silhouette
+    energy: Scholarly, accessible
+  - name: Lens Mark
+    primitives: [circle, circle]
+    composition: Two overlapping circles (vesica piscis) representing dual perspective/insight
+    energy: Insightful, precise

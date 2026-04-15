@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell } = require('electron');
+const { app, BrowserWindow, shell, ipcMain } = require('electron');
 const path = require('path');
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -55,6 +55,19 @@ function createWindow() {
     }
   });
 }
+
+// IPC: Navigation between Chat and OPAL views
+ipcMain.on('navigate', (event, target) => {
+  if (!mainWindow) return;
+
+  if (target === 'opal') {
+    console.log('[NAV] Switching to OPAL Pipeline');
+    mainWindow.loadFile(path.join(__dirname, 'opal', 'index.html'));
+  } else {
+    console.log('[NAV] Switching to Chat');
+    mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+  }
+});
 
 // App lifecycle
 app.on('ready', () => {

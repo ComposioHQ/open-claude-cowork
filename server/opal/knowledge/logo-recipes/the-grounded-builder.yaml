@@ -1,0 +1,20 @@
+archetype: The Grounded Builder
+description: Reliable, structured, foundational. Brands built on trust, craft, and solid work.
+geometry: Symmetric
+visual_language:
+  - Horizontal stability
+  - Stacked or layered forms
+  - Square/rectangular foundations
+recipes:
+  - name: Cornerstone Block
+    primitives: [rectangle, rectangle]
+    composition: Two interlocking rectangles forming an L-shape cornerstone
+    energy: Stable, foundational
+  - name: Stacked Layers
+    primitives: [rectangle, rectangle, rectangle]
+    composition: Three horizontal bars with progressive spacing suggesting growth from solid base
+    energy: Methodical, trustworthy
+  - name: Keystone Arch
+    primitives: [arc, rectangle, trapezoid]
+    composition: Arch form with keystone element at crown, suggesting structural integrity
+    energy: Enduring, crafted

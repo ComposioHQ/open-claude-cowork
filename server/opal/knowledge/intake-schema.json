@@ -1,0 +1,112 @@
+{
+  "version": "3.1",
+  "title": "Brand Intelligence Intake Questionnaire",
+  "sections": {
+    "A": {
+      "name": "Company Foundation",
+      "required": false,
+      "questions": {
+        "A1": { "label": "Company/Brand Name", "type": "text" },
+        "A2": { "label": "Year Founded", "type": "text" },
+        "A3": { "label": "Industry / Sector", "type": "text" },
+        "A4": { "label": "Company Size (employees)", "type": "text" },
+        "A5": { "label": "Headquarters Location", "type": "text" },
+        "A6": { "label": "Markets Served (regions/countries)", "type": "text" },
+        "A7": { "label": "Company Mission Statement", "type": "long_text" },
+        "A8": { "label": "Company Vision Statement", "type": "long_text" }
+      }
+    },
+    "B": {
+      "name": "Brand Identity & Positioning",
+      "required": false,
+      "questions": {
+        "B1": { "label": "Current Brand Tagline/Slogan (if any)", "type": "text" },
+        "B2": { "label": "Brand Archetype (e.g., The Creator, The Explorer, The Sage)", "type": "text" },
+        "B3": { "label": "Core Brand Values (list 3-5)", "type": "long_text" },
+        "B4": { "label": "What makes your brand unique? (USP)", "type": "long_text" },
+        "B5": { "label": "If your brand were a person, how would you describe their personality?", "type": "long_text" },
+        "B6": { "label": "What emotions should people feel when interacting with your brand?", "type": "long_text" },
+        "B7": { "label": "Brand Promise — what do you guarantee to your customers?", "type": "long_text" }
+      }
+    },
+    "C1": {
+      "name": "Audience DNA",
+      "required": true,
+      "gate_critical": true,
+      "questions": {
+        "C1_1": { "label": "Primary Target Audience — demographics (age, gender, income, education)", "type": "long_text" },
+        "C1_2": { "label": "Primary Target Audience — psychographics (values, interests, lifestyle)", "type": "long_text" },
+        "C1_3": { "label": "What is the #1 pain point your audience faces?", "type": "long_text" },
+        "C1_4": { "label": "What is the #1 desire or aspiration of your audience?", "type": "long_text" },
+        "C1_5": { "label": "Where does your audience spend time online? (platforms, communities)", "type": "long_text" },
+        "C1_6": { "label": "What language/tone does your audience use? (formal, casual, technical)", "type": "text" },
+        "C1_7": { "label": "Secondary Target Audience (if any)", "type": "long_text" }
+      }
+    },
+    "C2": {
+      "name": "Customer Journey",
+      "required": false,
+      "questions": {
+        "C2_1": { "label": "How do customers typically discover your brand?", "type": "long_text" },
+        "C2_2": { "label": "What is the typical decision-making process for your customers?", "type": "long_text" },
+        "C2_3": { "label": "What are the main objections or hesitations before purchasing?", "type": "long_text" },
+        "C2_4": { "label": "What does the post-purchase experience look like?", "type": "long_text" }
+      }
+    },
+    "D": {
+      "name": "Products & Services",
+      "required": false,
+      "questions": {
+        "D1": { "label": "Core Products/Services (list with brief descriptions)", "type": "long_text" },
+        "D2": { "label": "Price Positioning (budget, mid-range, premium, luxury)", "type": "text" },
+        "D3": { "label": "Key differentiators from competitors' products", "type": "long_text" },
+        "D4": { "label": "Flagship offering — the one thing you want to be known for", "type": "long_text" }
+      }
+    },
+    "E": {
+      "name": "Visual Preferences",
+      "required": false,
+      "questions": {
+        "E1": { "label": "Colors you love for this brand (or existing brand colors)", "type": "text" },
+        "E2": { "label": "Colors you absolutely do NOT want", "type": "text" },
+        "E3": { "label": "Visual style preference (minimalist, bold, organic, geometric, luxurious)", "type": "text" },
+        "E4": { "label": "Brands whose visual identity you admire (and why)", "type": "long_text" },
+        "E5": { "label": "Any existing brand assets? (logo, fonts, style guide)", "type": "text" }
+      }
+    },
+    "F": {
+      "name": "Voice & Tone",
+      "required": false,
+      "questions": {
+        "F1": { "label": "3 adjectives that describe how your brand should sound", "type": "text" },
+        "F2": { "label": "Words or phrases your brand should NEVER use", "type": "long_text" },
+        "F3": { "label": "Communication style (authoritative, friendly, playful, technical, poetic)", "type": "text" },
+        "F4": { "label": "Content formats you plan to use (blog, social, video, podcast, email)", "type": "long_text" }
+      }
+    },
+    "G": {
+      "name": "Business Goals",
+      "required": false,
+      "questions": {
+        "G1": { "label": "Primary business goal for the next 12 months", "type": "long_text" },
+        "G2": { "label": "What does success look like in 90 days?", "type": "long_text" },
+        "G3": { "label": "Key metrics you track (revenue, leads, engagement, retention)", "type": "text" },
+        "G4": { "label": "Current marketing budget range", "type": "text" },
+        "G5": { "label": "Are you launching something new, rebranding, or scaling?", "type": "text" }
+      }
+    },
+    "H": {
+      "name": "Competitors",
+      "required": true,
+      "gate_critical": true,
+      "questions": {
+        "H1": { "label": "Top 3 direct competitors (with URLs if possible)", "type": "long_text" },
+        "H2": { "label": "What do competitors do well that you respect?", "type": "long_text" },
+        "H3": { "label": "What do competitors do poorly that you want to avoid?", "type": "long_text" },
+        "H4": { "label": "How do you want to be perceived DIFFERENTLY from competitors?", "type": "long_text" }
+      }
+    }
+  },
+  "total_questions": 42,
+  "gate_sections": ["C1", "H"]
+}

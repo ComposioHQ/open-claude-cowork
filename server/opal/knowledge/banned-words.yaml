@@ -1,0 +1,43 @@
+# Universal Banned Word Library
+# Words and phrases that make AI-generated content sound generic
+
+banned_words:
+  - Unleash
+  - Elevate
+  - Leverage
+  - Synergy
+  - Disrupt
+  - Game-changing
+  - Revolutionary
+  - Cutting-edge
+  - World-class
+  - Best-in-class
+  - Seamless
+  - Robust
+  - Scalable
+  - Holistic
+  - Paradigm
+  - Empower
+  - Catalyst
+  - Streamline
+  - Innovative
+  - Transform (when used as marketing filler)
+
+banned_phrases:
+  - "In today's fast-paced world"
+  - "Are you ready to..."
+  - "Imagine a world where..."
+  - "Take your X to the next level"
+  - "We don't just X, we Y"
+  - "The future of X is here"
+  - "One-stop shop"
+  - "Turn your dreams into reality"
+  - "Unlock your potential"
+  - "Passion for excellence"
+
+banned_structures:
+  - Rhetorical questions as opening hooks
+  - Exclamation marks in professional headlines
+  - Empty superlatives without specific evidence
+  - Triple adjective chains ("fast, reliable, and innovative")
+  - Starting sentences with "Whether you're..."

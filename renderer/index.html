@@ -28,6 +28,23 @@
       <div class="chat-history-list" id="chatHistoryList">
         <!-- Chat history items will be added here -->
       </div>
+      <div style="padding: 12px; border-top: 1px solid rgba(255,255,255,0.08);">
+        <button onclick="window.opalAPI && window.opalAPI.navigateToOpal()" style="
+          width: 100%;
+          padding: 10px 16px;
+          background: linear-gradient(135deg, #7c4dff, #64b5f6);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          letter-spacing: 1px;
+          transition: opacity 0.2s;
+        " onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          OPAL Pipeline
+        </button>
+      </div>
     </aside>
 
     <!-- Left Sidebar Expand Button (visible when collapsed) -->

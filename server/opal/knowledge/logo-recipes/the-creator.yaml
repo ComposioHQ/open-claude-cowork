@@ -1,0 +1,20 @@
+archetype: The Creator
+description: Imaginative, inventive, expressive. Brands that value originality and self-expression.
+geometry: Asymmetric
+visual_language:
+  - Dynamic angles
+  - Open forms suggesting creation/emergence
+  - Spirals or growth patterns
+recipes:
+  - name: Golden Spiral Mark
+    primitives: [arc, circle, line]
+    composition: Fibonacci spiral built from quarter-circle arcs with accent dot
+    energy: Flowing, organic
+  - name: Faceted Prism
+    primitives: [triangle, parallelogram]
+    composition: Overlapping triangles creating a prism effect with light refraction
+    energy: Bold, multifaceted
+  - name: Brushstroke Abstract
+    primitives: [bezier_path, circle]
+    composition: Single continuous curve suggesting a brushstroke with anchor point
+    energy: Expressive, fluid
