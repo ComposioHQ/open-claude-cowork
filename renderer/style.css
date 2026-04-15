@@ -6,6 +6,11 @@
   --brand-teal: #3eafac;
   --brand-teal-dark: #2d9693;
   --brand-teal-muted: rgba(62, 175, 172, 0.12);
+  --neon-cyan: #39ffea;
+  --neon-blue: #5aa8ff;
+  --neon-violet: #8b7cff;
+  --neon-glow-soft: 0 0 0 1px rgba(57, 255, 234, 0.24), 0 0 14px rgba(57, 255, 234, 0.28);
+  --neon-glow-strong: 0 0 0 1px rgba(57, 255, 234, 0.42), 0 0 20px rgba(57, 255, 234, 0.48);
 
   --bg-cream: #f3f6f8;
   --bg-white: #ffffff;
@@ -80,6 +85,7 @@ body {
 
 .left-sidebar-logo .brand-ai {
   color: var(--brand-teal);
+  text-shadow: 0 0 10px rgba(57, 255, 234, 0.55);
 }
 
 .left-sidebar-header {
@@ -143,6 +149,7 @@ body {
 
 .chat-history-item.active {
   background: var(--bg-cream);
+  box-shadow: inset 0 0 0 1px rgba(57, 255, 234, 0.32);
 }
 
 .chat-history-item svg {
@@ -327,6 +334,7 @@ body {
 
 .brand-ai {
   color: var(--brand-teal);
+  text-shadow: 0 0 12px rgba(57, 255, 234, 0.55);
 }
 
 .andy-line {
@@ -489,16 +497,18 @@ body {
   align-items: center;
   justify-content: center;
   border: none;
-  background: var(--accent-coral);
+  background: linear-gradient(135deg, var(--brand-teal) 0%, var(--neon-blue) 100%);
   border-radius: 12px;
   cursor: pointer;
   color: white;
-  transition: background 0.15s, opacity 0.15s;
+  transition: background 0.15s, opacity 0.15s, box-shadow 0.15s, transform 0.15s;
+  box-shadow: var(--neon-glow-soft);
 }
 
 .send-btn:hover:not(:disabled) {
-  background: var(--accent-coral-dark);
-  box-shadow: var(--shadow-teal);
+  background: linear-gradient(135deg, var(--brand-teal-dark) 0%, var(--neon-violet) 100%);
+  box-shadow: var(--neon-glow-strong);
+  transform: translateY(-1px);
 }
 
 .send-btn:disabled {
@@ -768,7 +778,7 @@ body {
   border-radius: 10px;
   object-fit: cover;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(62, 175, 172, 0.25);
+  box-shadow: 0 2px 10px rgba(62, 175, 172, 0.3), 0 0 14px rgba(57, 255, 234, 0.35);
   border: 2px solid var(--bg-white);
 }
 
@@ -1237,7 +1247,8 @@ body {
 .sidebar {
   width: 320px;
   height: 100vh;
-  background: linear-gradient(180deg, #1a2338 0%, var(--brand-navy) 100%);
+  background: radial-gradient(circle at 0% 0%, rgba(57, 255, 234, 0.12), transparent 32%),
+              linear-gradient(180deg, #1a2338 0%, var(--brand-navy) 100%);
   color: #e5e7eb;
   display: flex;
   flex-direction: column;
@@ -1267,6 +1278,7 @@ body {
   text-transform: uppercase;
   color: var(--brand-teal);
   margin: 0;
+  text-shadow: 0 0 10px rgba(57, 255, 234, 0.45);
 }
 
 .sidebar-toggle {
@@ -1317,6 +1329,10 @@ body {
   padding: 16px 20px 12px;
   cursor: pointer;
   flex-shrink: 0;
+}
+
+.section-header:hover {
+  color: #e2fdf8;
 }
 
 .section-header svg {
@@ -1433,6 +1449,7 @@ body {
   border-radius: 6px;
   overflow: hidden;
   flex-shrink: 0;
+  border: 1px solid rgba(90, 168, 255, 0.16);
 }
 
 .tool-call-header {
@@ -1981,6 +1998,7 @@ body {
 .left-sidebar-expand-btn:hover {
   background: var(--bg-cream);
   color: var(--text-primary);
+  box-shadow: var(--neon-glow-soft);
 }
 
 .left-sidebar-expand-btn svg {
@@ -2015,6 +2033,7 @@ body {
 .right-sidebar-expand-btn:hover {
   background: var(--bg-cream);
   color: var(--text-primary);
+  box-shadow: var(--neon-glow-soft);
 }
 
 .right-sidebar-expand-btn svg {
