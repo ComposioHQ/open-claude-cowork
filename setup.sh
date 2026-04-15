@@ -95,8 +95,23 @@ echo ""
 # Install dependencies
 echo "Installing project dependencies..."
 echo ""
+
+if ! command -v python3 &> /dev/null; then
+    echo "python3 is required. Install Python 3.10+ and try again."
+    exit 1
+fi
+
+if [ ! -d .venv ]; then
+    echo "Creating Python virtual environment (.venv)..."
+    python3 -m venv .venv
+fi
+
+echo "Installing Python packages..."
+.venv/bin/pip install -U pip
+.venv/bin/pip install -r requirements.txt
+
+echo "Installing Electron dependencies (npm)..."
 npm install
-cd server && npm install && cd ..
 echo ""
 echo "Dependencies installed"
 echo ""
@@ -108,8 +123,9 @@ echo "================================"
 echo ""
 echo "Next steps:"
 echo "1. Make sure your .env file has both API keys configured"
-echo "2. Start the backend server:"
-echo "   cd server && npm start"
+echo "2. Start the Python backend (from repo root):"
+echo "   npm run server"
+echo "   # or: .venv/bin/python -m uvicorn server.app:app --host 127.0.0.1 --port 3001"
 echo ""
 echo "3. In a new terminal, start the Electron app:"
 echo "   npm start"
@@ -117,7 +133,7 @@ echo ""
 echo "For more info, check out:"
 echo "   - Composio Dashboard: https://platform.composio.dev"
 echo "   - Composio Docs: https://docs.composio.dev"
-echo "   - Claude Agent SDK: https://docs.anthropic.com/en/docs/claude-agent-sdk"
+echo "   - Claude Agent SDK (Python): https://platform.claude.com/docs/en/agent-sdk/python"
 echo ""
 echo "Need help? Open an issue on GitHub!"
 echo ""

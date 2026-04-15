@@ -9,16 +9,19 @@ You are an expert in Remotion, the React framework for creating videos programma
 ## Core Concepts
 
 ### The Fundamentals
+
 Remotion gives you a **frame number** and a **blank canvas**. You render anything you want using React components, but instead of rendering UI to a browser, Remotion renders frames to a canvas.
 
 ### Key Hooks
 
 **useCurrentFrame()**
+
 - Returns an integer identifying the current frame being viewed
 - Use this to animate properties, states, and styles
 - Example: `const frame = useCurrentFrame();`
 
 **interpolate()**
+
 - Helper function that maps values to another range using concise syntax
 - Makes animations more readable
 - Example: `interpolate(frame, [0, 100], [0, 1])`
@@ -26,29 +29,35 @@ Remotion gives you a **frame number** and a **blank canvas**. You render anythin
 ## Getting Started
 
 ### Create New Project
+
 ```bash
 # Requires Node.js 16+ or Bun 1.0.3+
 npx create-video@latest
 ```
 
 ### Start the Studio
+
 ```bash
 npm start
 ```
+
 The studio will open on port 3000 with a visual editor for your compositions.
 
 ## Best Practices
 
 ### 1. Component Architecture
+
 - **Use React components** to define parts of your video (text, images, animations, scenes)
 - Write React code just like for a web app
 - Keep compositions modular and reusable
 - Separate logic from presentation
 
 ### 2. Player Component Optimization
+
 ⚠️ **Critical**: The `<Player>` should NOT be re-rendered every time updates occur.
 
 **Do this:**
+
 ```jsx
 // Render controls and UI as siblings to the Player
 // Pass a ref to the player as a prop
@@ -65,6 +74,7 @@ function VideoApp() {
 ```
 
 **Don't do this:**
+
 ```jsx
 // ❌ Avoid re-rendering Player on every state change
 function VideoApp() {
@@ -74,6 +84,7 @@ function VideoApp() {
 ```
 
 ### 3. Dynamic Loading with lazyComponent
+
 When using `lazyComponent`, wrap it in `useCallback()` to avoid constant re-rendering:
 
 ```jsx
@@ -85,6 +96,7 @@ const MyLazyComponent = useCallback(() => {
 ### 4. Animation Patterns
 
 **Basic Frame-based Animation:**
+
 ```jsx
 import { useCurrentFrame, interpolate } from 'remotion';
 
@@ -101,6 +113,7 @@ export const MyComponent = () => {
 ```
 
 **Position Animation:**
+
 ```jsx
 const translateY = interpolate(
   frame,
@@ -117,12 +130,14 @@ return (
 ```
 
 ### 5. Working with External APIs
+
 - Fetch data during rendering using React hooks
 - Use environment variables for API keys
 - Handle loading states appropriately
 - Cache responses when possible
 
 ### 6. Performance Optimization
+
 - Use `delayRender()` and `continueRender()` for async operations
 - Optimize heavy computations
 - Preload assets when possible
@@ -131,6 +146,7 @@ return (
 ## Common Patterns
 
 ### Composition Structure
+
 ```jsx
 import { Composition } from 'remotion';
 
@@ -151,6 +167,7 @@ export const RemotionRoot = () => {
 ```
 
 ### Sequence and Series
+
 ```jsx
 import { Sequence, Series } from 'remotion';
 
@@ -176,29 +193,35 @@ import { Sequence, Series } from 'remotion';
 ## Troubleshooting
 
 ### Studio won't start
+
 - Check Node.js version (16+ required)
 - Clear node_modules and reinstall
 - Check port 3000 isn't already in use
 
 ### Animations not smooth
+
 - Ensure you're using `interpolate()` correctly
 - Check frame rate (fps) setting
 - Use `extrapolateRight: 'clamp'` to prevent values from going beyond range
 
 ### Player performance issues
+
 - Don't re-render Player unnecessarily (see best practices above)
 - Use refs instead of state for player controls
 - Optimize heavy components inside compositions
 
 ## Licensing Note
+
 Remotion has a special license. For commercial use, you may need to obtain a company license. Check the official documentation for details.
 
 ## Resources
-- Official Docs: https://www.remotion.dev/docs/
-- GitHub: https://github.com/remotion-dev/remotion
+
+- Official Docs: <https://www.remotion.dev/docs/>
+- GitHub: <https://github.com/remotion-dev/remotion>
 - Discord Community: Join for support and examples
 
 ## When to Use This Skill
+
 - User asks about creating videos with code
 - User mentions Remotion or programmatic video generation
 - User needs help with video animations in React

@@ -5,18 +5,13 @@
   "scripts": {
     "dev": "NODE_ENV=development electron .",
     "start": "electron .",
+    "server": ".venv/bin/python -m uvicorn server.app:app --host 127.0.0.1 --port 3001",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
-  "description": "Electron chat app with Claude Agent SDK and Opencode SDK support",
-  "dependencies": {
-    "@anthropic-ai/claude-agent-sdk": "^0.2.7",
-    "@opencode-ai/sdk": "latest",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^5.2.1"
-  },
+  "description": "Electron chat app (Python FastAPI backend + Claude Agent SDK / OpenCode)",
+  "dependencies": {},
   "devDependencies": {
     "electron": "^39.2.7",
     "electron-reload": "^2.0.0-alpha.1"

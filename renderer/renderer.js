@@ -643,6 +643,9 @@ function renderAttachedFiles(context) {
   if (attachedFiles.length === 0) {
     filesContainer.remove();
   }
+
+  updateSendButton(homeInput, homeSendBtn);
+  updateSendButton(messageInput, chatSendBtn);
 }
 
 // Remove attached file
@@ -698,13 +701,46 @@ function updateSendButton(input, button) {
     if (stopIcon) stopIcon.classList.remove('hidden');
   } else {
     // Normal mode - show send icon
-    button.disabled = !input.value.trim();
+    button.disabled = !input.value.trim() && attachedFiles.length === 0;
     button.classList.remove('streaming');
     const sendIcon = button.querySelector('.send-icon');
     const stopIcon = button.querySelector('.stop-icon');
     if (sendIcon) sendIcon.classList.remove('hidden');
     if (stopIcon) stopIcon.classList.add('hidden');
   }
+}
+
+function buildMessageWithAttachments(message, files) {
+  if (!files || files.length === 0) return message;
+
+  const header = message || 'Please analyze the attached files.';
+  const sections = files.map(file => {
+    const type = file.type || 'unknown';
+    const size = file.size || 0;
+    let content = '';
+
+    if (typeof file.data === 'string') {
+      if (type.startsWith('image/') || file.data.startsWith('data:image/')) {
+        content = '[image attachment: data url omitted]';
+      } else {
+        content = file.data;
+      }
+    } else {
+      content = '[unsupported attachment format]';
+    }
+
+    return [
+      `### Attachment: ${file.name}`,
+      `- type: ${type}`,
+      `- size: ${size} bytes`,
+      '',
+      '```',
+      content,
+      '```'
+    ].join('\n');
+  });
+
+  return `${header}\n\n${sections.join('\n\n')}`;
 }
 
 // Stop the current streaming query
@@ -782,27 +818,34 @@ async function handleSendMessage(e) {
 
   const input = isFirstMessage ? homeInput : messageInput;
   const message = input.value.trim();
+  const hasAttachments = attachedFiles.length > 0;
 
-  if (!message) {
+  if (!message && !hasAttachments) {
     return;
   }
+
+  const userDisplayMessage = message || `Attached ${attachedFiles.length} file(s)`;
+  const payloadMessage = buildMessageWithAttachments(message, attachedFiles);
 
   if (isFirstMessage) {
     // Always generate a new ID for a new conversation
     currentChatId = generateId();
     switchToChatView();
     isFirstMessage = false;
-    chatTitle.textContent = message.length > 30 ? message.substring(0, 30) + '...' : message;
+    chatTitle.textContent = userDisplayMessage.length > 30 ? userDisplayMessage.substring(0, 30) + '...' : userDisplayMessage;
   } else if (!currentChatId) {
     currentChatId = generateId();
-    chatTitle.textContent = message.length > 30 ? message.substring(0, 30) + '...' : message;
+    chatTitle.textContent = userDisplayMessage.length > 30 ? userDisplayMessage.substring(0, 30) + '...' : userDisplayMessage;
   }
 
   // Add user message
-  addUserMessage(message);
+  addUserMessage(userDisplayMessage);
 
   input.value = '';
   resetTextareaHeight(input);
+  attachedFiles = [];
+  renderAttachedFiles('home');
+  renderAttachedFiles('chat');
 
   // Set loading state
   isWaitingForResponse = true;
@@ -821,7 +864,7 @@ async function handleSendMessage(e) {
   try {
     console.log('[Chat] Sending message to API...');
     // Pass chatId, provider, and model for session management
-    const response = await window.electronAPI.sendMessage(message, currentChatId, selectedProvider, selectedModel);
+    const response = await window.electronAPI.sendMessage(payloadMessage, currentChatId, selectedProvider, selectedModel);
     console.log('[Chat] Response received');
 
     const reader = await response.getReader();

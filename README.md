@@ -72,11 +72,12 @@ cd open-claude-cowork
 ```
 
 Then run in two terminals:
-```bash
-# Terminal 1
-cd server && npm start
 
-# Terminal 2
+```bash
+# Terminal 1 (Python backend)
+npm run server
+
+# Terminal 2 (Electron)
 npm start
 ```
 
@@ -97,6 +98,7 @@ See [Secure Clawdbot Documentation](./clawd/README.md) for full setup.
 ## Features
 
 ### Open Claude Cowork
+
 - **Multi-Provider Support** - Claude Agent SDK or Opencode for different models
 - **Persistent Sessions** - Context maintained across messages
 - **Real-time Streaming** - Token-by-token response display
@@ -105,6 +107,7 @@ See [Secure Clawdbot Documentation](./clawd/README.md) for full setup.
 - **Modern UI** - Clean, dark-themed interface
 
 ### 🦑 Secure Clawdbot
+
 - **Multi-Platform** - WhatsApp, Telegram, Signal, iMessage
 - **Persistent Memory** - Remembers facts, preferences, daily notes
 - **Browser Automation** - Navigate, click, fill forms, screenshot
@@ -118,8 +121,8 @@ See [Secure Clawdbot Documentation](./clawd/README.md) for full setup.
 | Component | Technology |
 |-----------|------------|
 | Desktop | Electron.js |
-| Backend | Node.js + Express |
-| AI | Claude Agent SDK + Opencode SDK |
+| Backend | Python + FastAPI |
+| AI | Claude Agent SDK (Python) + OpenCode CLI (`opencode serve`) |
 | Tools | Composio Tool Router + MCP |
 | Streaming | Server-Sent Events (SSE) |
 
@@ -130,6 +133,7 @@ See [Secure Clawdbot Documentation](./clawd/README.md) for full setup.
 ### API Keys
 
 You need:
+
 - **Anthropic API key** from [console.anthropic.com](https://console.anthropic.com)
 - **Composio API key** from [app.composio.dev](https://app.composio.dev)
 - **Opencode API key** (optional) from [opencode.dev](https://opencode.dev)
@@ -163,9 +167,9 @@ See [Agent Skills documentation](https://platform.claude.com/docs/en/agent-sdk/s
 open-claude-cowork/
 ├── main.js              # Electron main process
 ├── renderer/            # Frontend UI
-├── server/              # Backend + providers
-│   ├── providers/       # Claude & Opencode implementations
-│   └── server.js        # Express server
+├── server/              # Python backend
+│   ├── app.py           # FastAPI app (SSE chat, Composio, routes)
+│   └── providers/       # Claude & OpenCode implementations
 ├── clawd/               # Secure Clawdbot (messaging bot)
 │   ├── cli.js           # Entry point
 │   ├── adapters/        # WhatsApp, Telegram, Signal, iMessage
