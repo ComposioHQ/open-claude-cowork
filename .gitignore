@@ -148,3 +148,6 @@ vite.config.ts.timestamp-*
 .vite/
 
 .DS_Store
+
+# Generated when the FastAPI server starts (Composio MCP URL + headers — do not commit)
+server/opencode.json

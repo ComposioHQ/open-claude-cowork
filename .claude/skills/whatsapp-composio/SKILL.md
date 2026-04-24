@@ -41,7 +41,35 @@ In Meta WhatsApp Cloud API settings, set **Callback URL** to:
 
 **Verify token** must match `META_WEBHOOK_VERIFY_TOKEN` in `.env`.
 
-Subscribe to **`messages`** (and usually **`message_echoes`** only if you need them).
+#### Field subscription (required for inbound)
+
+In **Meta for Developers** → your app → **WhatsApp** → **Configuration** (webhooks):
+
+1. Click **Edit** on the webhook and paste the callback URL above.
+2. Enter the same **Verify token** you put in `META_WEBHOOK_VERIFY_TOKEN`.
+3. Click **Manage** (or **Subscribe to fields**) and enable at least:
+   - **`messages`** — inbound user text (required for two-way chat in this app).
+4. **Save** / **Verify and save**. Meta will call `GET /webhooks/meta/whatsapp?hub.mode=subscribe&...` — your server must be reachable and return `hub.challenge`.
+
+Optional fields (only if you need them):
+
+- **`message_echoes`** — copies of messages your business sends (debugging / sync).
+- Avoid subscribing to everything unless you need it; fewer fields = less noise.
+
+#### Values to copy into `.env`
+
+From the same Meta app:
+
+- **App secret** → `META_APP_SECRET` (App settings → Basic → show App Secret).
+- **WhatsApp → API Setup** (or Phone numbers): the **Phone number ID** (numeric) → `WHATSAPP_PHONE_NUMBER_ID`.
+
+#### Composio connected account (if sends fail from the server)
+
+List WhatsApp connections and, if needed, set `WHATSAPP_COMPOSIO_CONNECTED_ACCOUNT_ID`:
+
+```bash
+composio connected-accounts list --toolkits whatsapp
+```
 
 ### 3) App environment variables
 
