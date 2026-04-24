@@ -13,13 +13,15 @@ from typing import Any
 
 from composio import Composio
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, PlainTextResponse, StreamingResponse
 from pydantic import BaseModel
 
 from server.providers import get_available_providers, get_provider, initialize_providers
 from server.tell_colleen import submit_feedback_to_github
+from server.whatsapp_meta import extract_inbound_text_messages, safe_json_dict, verify_meta_webhook_signature
+from server.whatsapp_reply import reply_to_whatsapp_inbound
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -30,6 +32,7 @@ REPO_ROOT = SERVER_DIR.parent
 load_dotenv(REPO_ROOT / ".env")
 
 PORT = int(os.environ.get("PORT", "3001"))
+HOST = os.environ.get("HOST", "127.0.0.1")
 
 composio_client: Composio | None = None
 composio_sessions: dict[str, Any] = {}
@@ -269,12 +272,124 @@ async def health():
     }
 
 
+@app.get("/webhooks/meta/whatsapp")
+async def meta_whatsapp_verify(request: Request):
+    """Meta WhatsApp Cloud API webhook verification (GET)."""
+    mode = request.query_params.get("hub.mode")
+    token = request.query_params.get("hub.verify_token")
+    challenge = request.query_params.get("hub.challenge")
+    expected = os.environ.get("META_WEBHOOK_VERIFY_TOKEN", "")
+    if mode == "subscribe" and token and expected and token == expected and challenge:
+        return PlainTextResponse(challenge)
+    return JSONResponse({"error": "Forbidden"}, status_code=403)
+
+
+@app.post("/webhooks/meta/whatsapp")
+async def meta_whatsapp_inbound(request: Request):
+    """Meta WhatsApp Cloud API inbound messages (POST)."""
+    raw = await request.body()
+    app_secret = os.environ.get("META_APP_SECRET", "")
+    allow_unsigned = os.environ.get("META_WEBHOOK_ALLOW_UNSIGNED", "").lower() in ("1", "true", "yes")
+    sig = request.headers.get("X-Hub-Signature-256")
+    if app_secret and not allow_unsigned:
+        if not verify_meta_webhook_signature(app_secret, raw, sig):
+            logger.warning("[META-WA] Invalid webhook signature")
+            return JSONResponse({"error": "invalid signature"}, status_code=403)
+    elif not app_secret and not allow_unsigned:
+        logger.warning(
+            "[META-WA] META_APP_SECRET not set; rejecting POST "
+            "(set META_APP_SECRET or META_WEBHOOK_ALLOW_UNSIGNED=1 for local dev only)"
+        )
+        return JSONResponse({"error": "META_APP_SECRET not configured"}, status_code=503)
+
+    payload = safe_json_dict(raw)
+    if not payload:
+        return JSONResponse({"error": "invalid json"}, status_code=400)
+
+    default_phone_number_id = os.environ.get("WHATSAPP_PHONE_NUMBER_ID", "")
+    connected_account_id = os.environ.get("WHATSAPP_COMPOSIO_CONNECTED_ACCOUNT_ID") or None
+
+    messages = extract_inbound_text_messages(payload)
+    if not messages:
+        return {"success": True, "handled": 0}
+
+    for m in messages:
+        from_number = m["from"]
+        text = m["text"]
+        msg_id = m.get("message_id")
+        phone_number_id = m.get("phone_number_id") or default_phone_number_id
+        if not phone_number_id:
+            logger.error("[META-WA] Missing phone_number_id on message and WHATSAPP_PHONE_NUMBER_ID unset")
+            continue
+
+        async def _run(
+            fn: str = from_number,
+            tx: str = text,
+            mid: str | None = msg_id,
+            pid: str = phone_number_id,
+            caid: str | None = connected_account_id,
+        ) -> None:
+            global composio_client
+            assert composio_client is not None
+            try:
+                await reply_to_whatsapp_inbound(
+                    composio_client=composio_client,
+                    composio_sessions=composio_sessions,
+                    from_number=fn,
+                    inbound_text=tx,
+                    message_id=mid,
+                    phone_number_id=pid,
+                    connected_account_id=caid,
+                )
+            except Exception as e:
+                logger.exception("[META-WA] Reply task failed: %s", e)
+
+        asyncio.create_task(_run())
+
+    return {"success": True, "queued": len(messages)}
+
+
+@app.post("/webhooks/composio")
+async def composio_org_webhook(request: Request):
+    """Composio org webhook (trigger events). Verifies signature when COMPOSIO_WEBHOOK_SECRET is set."""
+    global composio_client
+    raw = await request.body()
+    text_body = raw.decode("utf-8")
+    secret = os.environ.get("COMPOSIO_WEBHOOK_SECRET", "")
+    if secret:
+        if composio_client is None:
+            return JSONResponse({"error": "server not ready"}, status_code=503)
+        try:
+            composio_client.triggers.verify_webhook(
+                id=request.headers.get("webhook-id", ""),
+                payload=text_body,
+                signature=request.headers.get("webhook-signature", ""),
+                timestamp=request.headers.get("webhook-timestamp", ""),
+                secret=secret,
+            )
+        except Exception as e:
+            logger.warning("[COMPOSIO-WEBHOOK] Signature verify failed: %s", e)
+            return JSONResponse({"error": "invalid signature"}, status_code=403)
+
+    try:
+        payload = json.loads(text_body)
+    except json.JSONDecodeError:
+        return JSONResponse({"error": "invalid json"}, status_code=400)
+
+    logger.info(
+        "[COMPOSIO-WEBHOOK] event type=%s trigger=%s",
+        payload.get("type"),
+        (payload.get("metadata") or {}).get("trigger_slug"),
+    )
+    return {"success": True}
+
+
 def main() -> None:
     import uvicorn
 
     uvicorn.run(
         "server.app:app",
-        host="127.0.0.1",
+        host=HOST,
         port=PORT,
         reload=False,
     )
