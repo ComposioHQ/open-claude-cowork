@@ -79,6 +79,8 @@ Set in `.env` (names only — do not commit real secrets):
 - `META_WEBHOOK_VERIFY_TOKEN` — must match Meta “Verify token”
 - `WHATSAPP_PHONE_NUMBER_ID` — Meta numeric sender id (fallback if webhook metadata omits it)
 - `WHATSAPP_COMPOSIO_CONNECTED_ACCOUNT_ID` — optional; Composio connected account id for WhatsApp if required by your org
+- `WHATSAPP_COMPOSIO_USER_ID` — optional; Composio entity/user id that owns the connected WhatsApp account, defaults to `default-user`
+- `COMPOSIO_TOOLKIT_VERSION_WHATSAPP` — optional; defaults to `20260414_00` for manual `WHATSAPP_SEND_MESSAGE` execution
 
 **Local dev only (insecure):** `META_WEBHOOK_ALLOW_UNSIGNED=1` skips signature verification — never use in production.
 

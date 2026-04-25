@@ -4,11 +4,20 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
+import re
 from typing import Any
 
 from server.providers import get_provider
 
 logger = logging.getLogger(__name__)
+
+
+THINKING_BLOCK_RE = re.compile(
+    r"(?is)<(?:antml:)?thinking\b[^>]*>.*?</(?:antml:)?thinking>|"
+    r"<(?:antml:)?thinking\b[^>]*/>|"
+    r"```(?:thinking|reasoning)\s*.*?```"
+)
 
 
 def _mcp_url_headers(session: Any) -> tuple[str, dict[str, str]]:
@@ -33,12 +42,22 @@ def _tool_execute(
     user_id: str,
     connected_account_id: str | None,
 ) -> Any:
+    whatsapp_toolkit_version = os.environ.get("COMPOSIO_TOOLKIT_VERSION_WHATSAPP", "20260414_00")
     return composio_client.tools.execute(
         slug,
         arguments,
         user_id=user_id,
         connected_account_id=connected_account_id,
+        version=whatsapp_toolkit_version,
     )
+
+
+def _clean_whatsapp_reply(text: str) -> str:
+    """Remove reasoning wrappers and keep the message short enough for WhatsApp."""
+    cleaned = THINKING_BLOCK_RE.sub("", text).strip()
+    # Drop common leaked labels if a model includes them despite the stream filter.
+    cleaned = re.sub(r"(?im)^\s*(thinking|reasoning|analysis)\s*:\s*", "", cleaned).strip()
+    return cleaned[:4090]
 
 
 async def reply_to_whatsapp_inbound(
@@ -71,6 +90,8 @@ async def reply_to_whatsapp_inbound(
     provider = get_provider("claude")
     prompt = (
         "You are Andy the Analyst replying on WhatsApp. Be concise and mobile-friendly.\n"
+        "Return only the final user-facing answer. Do not include reasoning, analysis, "
+        "thinking blocks, tool notes, or markdown wrappers.\n"
         f"The user's WhatsApp number (no +) is: {from_number}\n\n"
         f"They sent:\n{inbound_text}"
     )
@@ -98,17 +119,21 @@ async def reply_to_whatsapp_inbound(
     }
 
     async for chunk in provider.query(params):
-        if isinstance(chunk, dict) and chunk.get("type") == "text":
+        if (
+            isinstance(chunk, dict)
+            and chunk.get("type") == "text"
+            and not chunk.get("isReasoning")
+        ):
             c = chunk.get("content")
             if isinstance(c, str) and c:
                 text_parts.append(c)
 
-    reply = "".join(text_parts).strip()
+    reply = _clean_whatsapp_reply("".join(text_parts))
     if not reply:
         reply = "Got it — I'm here. Ask me anything in a short message and I'll help."
 
     args: dict[str, Any] = {
-        "text": reply[:4090],
+        "text": reply,
         "to_number": from_number,
         "phone_number_id": phone_number_id,
     }
@@ -116,13 +141,14 @@ async def reply_to_whatsapp_inbound(
         args["message_id"] = message_id
 
     logger.info("[META-WA] Sending reply to %s via WHATSAPP_SEND_MESSAGE", from_number)
+    send_user_id = os.environ.get("WHATSAPP_COMPOSIO_USER_ID", "default-user")
 
     def _send() -> Any:
         return _tool_execute(
             composio_client,
             "WHATSAPP_SEND_MESSAGE",
             args,
-            user_id=user_id,
+            user_id=send_user_id,
             connected_account_id=connected_account_id,
         )
 
