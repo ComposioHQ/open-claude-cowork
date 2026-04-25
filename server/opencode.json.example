@@ -1,0 +1,11 @@
+{
+  "mcp": {
+    "composio": {
+      "type": "remote",
+      "url": "https://backend.composio.dev/tool_router/YOUR_SESSION_ID/mcp",
+      "headers": {
+        "x-api-key": "YOUR_TOOL_ROUTER_KEY"
+      }
+    }
+  }
+}

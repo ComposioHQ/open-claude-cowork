@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claude</title>
+  <title>kangAIrooski · Andy</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -11,6 +11,9 @@
   <div class="app-container">
     <!-- Left Sidebar - Chat History -->
     <aside class="left-sidebar" id="leftSidebar">
+      <div class="left-sidebar-brand" title="kangAIrooski">
+        <span class="left-sidebar-logo">kang<span class="brand-ai">AI</span>rooski</span>
+      </div>
       <div class="left-sidebar-header">
         <button class="new-chat-sidebar-btn" onclick="startNewChat()" title="New chat">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -43,8 +46,23 @@
       <div class="home-view" id="homeView">
       <div class="greeting-section">
         <div class="greeting">
-          <h1 class="greeting-text">Open Claude Cowork</h1>
-          <p class="tagline">Powered by Claude Code and Composio</p>
+          <p class="eyebrow">Your analyst · Data &amp; spreadsheets</p>
+          <div class="greeting-hero">
+            <img
+              class="andy-avatar"
+              src="assets/andy_headshot.png"
+              width="88"
+              height="88"
+              alt=""
+            />
+            <div class="greeting-titles">
+              <h1 class="greeting-text">
+                <span class="brand-word">kang</span><span class="brand-ai">AI</span><span class="brand-word">rooski</span>
+              </h1>
+              <p class="andy-line">Chat with <strong>Andy the Analyst</strong></p>
+            </div>
+          </div>
+          <p class="tagline">Clear answers from your numbers — with Claude &amp; Composio under the hood.</p>
         </div>
       </div>
 
@@ -54,7 +72,7 @@
             <textarea
               id="homeInput"
               class="message-input"
-              placeholder="Ask me anything"
+              placeholder="Ask Andy anything — data, models, or Tell Colleen…"
               autocomplete="off"
               rows="1"
             ></textarea>
@@ -153,12 +171,15 @@
     <div class="chat-view hidden" id="chatView">
       <div class="chat-main">
         <header class="chat-header">
-          <button class="chat-title-btn">
-            <span id="chatTitle">New chat</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
+          <div class="chat-header-left">
+            <img class="chat-header-avatar" src="assets/andy_headshot.png" width="32" height="32" alt="" />
+            <button class="chat-title-btn">
+              <span id="chatTitle">New chat</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+          </div>
           <button class="new-chat-btn" onclick="startNewChat()" title="New chat">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -178,7 +199,7 @@
                 <textarea
                   id="messageInput"
                   class="message-input"
-                  placeholder="Reply..."
+                  placeholder="Message Andy…"
                   autocomplete="off"
                   rows="1"
                 ></textarea>
@@ -271,7 +292,7 @@
               </div>
             </form>
           </div>
-          <p class="disclaimer">Claude is AI and can make mistakes. Please double-check responses.</p>
+          <p class="disclaimer">Andy runs on AI — verify important numbers and decisions.</p>
         </div>
       </div>
 

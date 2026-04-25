@@ -37,6 +37,13 @@ bower_components
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
 # Dependency directories
 node_modules/
 jspm_packages/
@@ -141,3 +148,6 @@ vite.config.ts.timestamp-*
 .vite/
 
 .DS_Store
+
+# Generated when the FastAPI server starts (Composio MCP URL + headers — do not commit)
+server/opencode.json
