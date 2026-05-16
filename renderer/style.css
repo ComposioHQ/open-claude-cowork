@@ -136,6 +136,21 @@ body {
   text-overflow: ellipsis;
 }
 
+.chat-unread-badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--accent-coral);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
 .chat-history-item .delete-chat-btn {
   opacity: 0;
   padding: 4px;
@@ -697,6 +712,176 @@ body {
   color: var(--text-tertiary);
 }
 
+/* Incoming Inbox */
+.chat-inbox {
+  margin: 0 24px 12px;
+  padding: 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: #f7f7f2;
+  flex-shrink: 0;
+}
+
+.chat-inbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.chat-inbox-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.chat-inbox-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.chat-inbox-refresh {
+  border: 1px solid var(--border-light);
+  background: var(--bg-white);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.chat-inbox-refresh:hover {
+  background: var(--bg-cream);
+}
+
+.chat-inbox-mode-badge {
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1d4ed8;
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.chat-inbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.chat-inbox-empty {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.inbox-card {
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--bg-white);
+  padding: 10px;
+}
+
+.inbox-card.unread {
+  border-color: var(--accent-coral);
+  box-shadow: 0 0 0 1px rgba(196, 145, 123, 0.15);
+}
+
+.inbox-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.inbox-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.inbox-from {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.inbox-time {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.inbox-risk {
+  font-size: 11px;
+  border-radius: 999px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.inbox-risk-low {
+  background: rgba(22, 163, 74, 0.12);
+  color: #166534;
+}
+
+.inbox-risk-medium {
+  background: rgba(217, 119, 6, 0.12);
+  color: #92400e;
+}
+
+.inbox-risk-high {
+  background: rgba(220, 38, 38, 0.12);
+  color: #991b1b;
+}
+
+.inbox-auto-badge {
+  font-size: 11px;
+  border-radius: 999px;
+  padding: 2px 8px;
+  background: rgba(59, 130, 246, 0.12);
+  color: #1d4ed8;
+  white-space: nowrap;
+}
+
+.inbox-card-content {
+  font-size: 13px;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.inbox-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.inbox-action-btn {
+  border: 1px solid var(--border-light);
+  background: var(--bg-white);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.inbox-action-btn:hover {
+  background: var(--bg-cream);
+}
+
+.inbox-action-btn.selected {
+  background: var(--accent-coral);
+  border-color: var(--accent-coral);
+  color: #fff;
+}
+
 /* New Chat Button */
 .new-chat-btn {
   display: flex;
@@ -759,6 +944,10 @@ body {
   flex-direction: column;
 }
 
+.message.system {
+  justify-content: center;
+}
+
 /* User Message */
 .user .message-content {
   background: var(--user-bubble);
@@ -777,6 +966,28 @@ body {
   line-height: 1.7;
   color: var(--text-primary);
   width: 100%;
+}
+
+.system .message-content {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.message.system.error .message-content {
+  border-color: rgba(192, 57, 43, 0.35);
+  color: #a93226;
+  background: rgba(192, 57, 43, 0.08);
+}
+
+.message.system.success .message-content {
+  border-color: rgba(34, 139, 34, 0.35);
+  color: #1d6f42;
+  background: rgba(34, 139, 34, 0.08);
 }
 
 .assistant .message-content p {

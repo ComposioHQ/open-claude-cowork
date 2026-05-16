@@ -6,6 +6,17 @@ import fs from 'fs';
 import dotenv from 'dotenv';
 import { Composio } from '@composio/core';
 import { getProvider, getAvailableProviders, initializeProviders } from './providers/index.js';
+import {
+  createMessage,
+  getUnreadCount,
+  listMessages,
+  markRead
+} from './session-bus.js';
+import {
+  completeHandoff,
+  createHandoff,
+  listHandoffs
+} from './codex-handoff.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,14 +26,20 @@ dotenv.config({ path: path.join(__dirname, '..', '.env') });
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Initialize Composio
-const composio = new Composio();
+// Initialize Composio lazily. Cowork core UI/session bus should boot even
+// when COMPOSIO_API_KEY is not configured; Composio tools are optional.
+const composio = process.env.COMPOSIO_API_KEY ? new Composio() : null;
 
 const composioSessions = new Map();
 let defaultComposioSession = null;
 
 // Pre-initialize Composio session on startup
 async function initializeComposioSession() {
+  if (!composio) {
+    console.warn('[COMPOSIO] COMPOSIO_API_KEY not configured; starting without Composio MCP tools');
+    return;
+  }
+
   const defaultUserId = 'default-user';
   console.log('[COMPOSIO] Pre-initializing session for:', defaultUserId);
   try {
@@ -103,31 +120,36 @@ app.post('/api/chat', async (req, res) => {
   });
 
   try {
-    // Get or create Composio session for this user
-    let composioSession = composioSessions.get(userId);
-    if (!composioSession) {
-      console.log('[COMPOSIO] Creating new session for user:', userId);
-      res.write(`data: ${JSON.stringify({ type: 'status', message: 'Initializing session...' })}\n\n`);
-      composioSession = await composio.create(userId);
-      composioSessions.set(userId, composioSession);
-      console.log('[COMPOSIO] Session created with MCP URL:', composioSession.mcp.url);
+    // Get or create Composio session for this user when configured.
+    let composioSession = null;
+    if (composio) {
+      composioSession = composioSessions.get(userId);
+      if (!composioSession) {
+        console.log('[COMPOSIO] Creating new session for user:', userId);
+        res.write(`data: ${JSON.stringify({ type: 'status', message: 'Initializing session...' })}\n\n`);
+        composioSession = await composio.create(userId);
+        composioSessions.set(userId, composioSession);
+        console.log('[COMPOSIO] Session created with MCP URL:', composioSession.mcp.url);
 
-      // Update opencode.json with the MCP config
-      updateOpencodeConfig(composioSession.mcp.url, composioSession.mcp.headers);
-      console.log('[OPENCODE] Updated opencode.json with MCP config');
+        // Update opencode.json with the MCP config
+        updateOpencodeConfig(composioSession.mcp.url, composioSession.mcp.headers);
+        console.log('[OPENCODE] Updated opencode.json with MCP config');
+      }
     }
 
     // Get the provider instance
     const provider = getProvider(providerName);
 
-    // Build MCP servers config - passed to provider
-    const mcpServers = {
-      composio: {
-        type: 'http',
-        url: composioSession.mcp.url,
-        headers: composioSession.mcp.headers
-      }
-    };
+    // Build MCP servers config - passed to provider only when Composio is configured
+    const mcpServers = composioSession
+      ? {
+          composio: {
+            type: 'http',
+            url: composioSession.mcp.url,
+            headers: composioSession.mcp.headers
+          }
+        }
+      : {};
 
     console.log('[CHAT] Using provider:', provider.name);
     console.log('[CHAT] All stored sessions:', Array.from(provider.sessions.entries()));
@@ -197,6 +219,168 @@ app.post('/api/abort', (req, res) => {
   } catch (error) {
     console.error('[ABORT] Error:', error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Session bus: list incoming messages for a chat
+app.get('/api/chats/messages', (req, res) => {
+  const {
+    chatId,
+    status,
+    includeBroadcast = 'false',
+    excludeFromChatId = null,
+    limit = '0'
+  } = req.query;
+
+  if (!chatId) {
+    return res.status(400).json({ error: 'chatId is required' });
+  }
+
+  try {
+    const messages = listMessages({
+      chatId,
+      status,
+      includeBroadcast: includeBroadcast === 'true',
+      excludeFromChatId: excludeFromChatId || null,
+      limit: Number(limit || 0)
+    });
+    res.json({ messages });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Session bus: unread count for badge
+app.get('/api/chats/messages/unread-count', (req, res) => {
+  const { chatId } = req.query;
+
+  if (!chatId) {
+    return res.status(400).json({ error: 'chatId is required' });
+  }
+
+  try {
+    const count = getUnreadCount({ chatId });
+    res.json({ chatId, count });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Session bus: create a note from one chat to another
+app.post('/api/chats/messages', (req, res) => {
+  const {
+    fromChatId,
+    fromTitle,
+    toChatId,
+    toTitle,
+    content,
+    kind,
+    sourceMessageId = null
+  } = req.body || {};
+
+  try {
+    const message = createMessage({
+      fromChatId,
+      fromTitle,
+      toChatId,
+      toTitle,
+      content,
+      kind,
+      sourceMessageId
+    });
+    res.status(201).json({ message });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Session bus: mark one message as read
+app.post('/api/chats/messages/:id/read', (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const message = markRead({ messageId: id });
+    res.json({ message });
+  } catch (error) {
+    if (error.message === 'message not found') {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Codex handoff lane: create a task package for a Codex session
+app.post('/api/codex/handoffs', (req, res) => {
+  const {
+    fromChatId,
+    fromTitle,
+    goal,
+    repoPath = '',
+    context = '',
+    constraints = ''
+  } = req.body || {};
+
+  try {
+    const handoff = createHandoff({
+      fromChatId,
+      fromTitle,
+      goal,
+      repoPath,
+      context,
+      constraints
+    });
+    res.status(201).json({ handoff });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Codex handoff lane: list task packages
+app.get('/api/codex/handoffs', (req, res) => {
+  const {
+    chatId = null,
+    status = null,
+    limit = '50'
+  } = req.query;
+
+  try {
+    const handoffs = listHandoffs({
+      chatId: chatId || null,
+      status: status || null,
+      limit: Number(limit || 50)
+    });
+    res.json({ handoffs });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Codex handoff lane: receive completion report and send it back to Cowork inbox
+app.post('/api/codex/handoffs/:id/complete', (req, res) => {
+  const { id } = req.params;
+  const {
+    summary,
+    filesChanged = [],
+    testsRun = [],
+    blockers = [],
+    nextSteps = []
+  } = req.body || {};
+
+  try {
+    const result = completeHandoff({
+      handoffId: id,
+      summary,
+      filesChanged,
+      testsRun,
+      blockers,
+      nextSteps
+    });
+    res.json(result);
+  } catch (error) {
+    if (error.message === 'handoff not found') {
+      return res.status(404).json({ error: error.message });
+    }
+    res.status(400).json({ error: error.message });
   }
 });
 

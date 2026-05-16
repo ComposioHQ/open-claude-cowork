@@ -114,5 +114,126 @@ contextBridge.exposeInMainWorld('electronAPI', {
       console.error('[PRELOAD] Error fetching providers:', error);
       return { providers: ['claude'], default: 'claude' };
     }
+  },
+
+  // Session bus: list messages for one chat
+  listChatMessages: async (chatId, options = {}) => {
+    try {
+      const params = new URLSearchParams({ chatId });
+      if (options?.status) {
+        params.set('status', options.status);
+      }
+      if (options?.includeBroadcast) {
+        params.set('includeBroadcast', 'true');
+      }
+      if (options?.excludeFromChatId) {
+        params.set('excludeFromChatId', options.excludeFromChatId);
+      }
+      if (options?.limit) {
+        params.set('limit', String(options.limit));
+      }
+
+      const response = await fetch(`${SERVER_URL}/api/chats/messages?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('[PRELOAD] Error listing chat messages:', error);
+      return { messages: [] };
+    }
+  },
+
+  // Session bus: unread count for a chat
+  getChatUnreadCount: async (chatId) => {
+    try {
+      const params = new URLSearchParams({ chatId });
+      const response = await fetch(`${SERVER_URL}/api/chats/messages/unread-count?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('[PRELOAD] Error fetching unread count:', error);
+      return { chatId, count: 0 };
+    }
+  },
+
+  // Session bus: create message from one chat to another
+  createChatMessage: async (payload) => {
+    try {
+      const response = await fetch(`${SERVER_URL}/api/chats/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || `HTTP error! status: ${response.status}`);
+      }
+      return result;
+    } catch (error) {
+      console.error('[PRELOAD] Error creating chat message:', error);
+      return { error: error.message };
+    }
+  },
+
+  // Session bus: mark message as read
+  markChatMessageRead: async (messageId) => {
+    try {
+      const response = await fetch(`${SERVER_URL}/api/chats/messages/${encodeURIComponent(messageId)}/read`, {
+        method: 'POST'
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || `HTTP error! status: ${response.status}`);
+      }
+      return result;
+    } catch (error) {
+      console.error('[PRELOAD] Error marking chat message as read:', error);
+      return { error: error.message };
+    }
+  },
+
+  // Codex handoff lane: create a package for Codex to continue work
+  createCodexHandoff: async (payload) => {
+    try {
+      const response = await fetch(`${SERVER_URL}/api/codex/handoffs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || `HTTP error! status: ${response.status}`);
+      }
+      return result;
+    } catch (error) {
+      console.error('[PRELOAD] Error creating Codex handoff:', error);
+      return { error: error.message };
+    }
+  },
+
+  // Codex handoff lane: list packages for this Cowork chat
+  listCodexHandoffs: async (options = {}) => {
+    try {
+      const params = new URLSearchParams();
+      if (options?.chatId) params.set('chatId', options.chatId);
+      if (options?.status) params.set('status', options.status);
+      if (options?.limit) params.set('limit', String(options.limit));
+      const response = await fetch(`${SERVER_URL}/api/codex/handoffs?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('[PRELOAD] Error listing Codex handoffs:', error);
+      return { handoffs: [] };
+    }
   }
 });

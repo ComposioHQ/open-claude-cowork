@@ -1,3 +1,5 @@
+import os from 'os';
+import path from 'path';
 import { createOpencode, createOpencodeClient } from '@opencode-ai/sdk';
 import { BaseProvider } from './base-provider.js';
 
@@ -44,6 +46,11 @@ export class OpencodeProvider extends BaseProvider {
     if (this.client) return;
 
     try {
+      const userBin = path.join(os.homedir(), 'bin');
+      if (!String(process.env.PATH || '').split(path.delimiter).includes(userBin)) {
+        process.env.PATH = `${userBin}${path.delimiter}${process.env.PATH || ''}`;
+      }
+
       if (this.useExistingServer && this.existingServerUrl) {
         // Connect to existing Opencode server
         console.log('[Opencode] Connecting to existing server:', this.existingServerUrl);
