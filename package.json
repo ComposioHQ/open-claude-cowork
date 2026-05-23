@@ -18,7 +18,7 @@
     "express": "^5.2.1"
   },
   "devDependencies": {
-    "electron": "^39.2.7",
+    "electron": "^39.8.5",
     "electron-reload": "^2.0.0-alpha.1"
   }
 }
