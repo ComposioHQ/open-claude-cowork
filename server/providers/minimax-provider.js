@@ -2,14 +2,14 @@ import { BaseProvider } from './base-provider.js';
 
 /**
  * MiniMax provider using OpenAI-compatible API
- * Supports MiniMax-M2.7 and MiniMax-M2.7-highspeed models
+ * Supports MiniMax-M3 (default), MiniMax-M2.7, and MiniMax-M2.7-highspeed models
  */
 export class MiniMaxProvider extends BaseProvider {
   constructor(config = {}) {
     super(config);
     this.apiKey = config.apiKey || process.env.MINIMAX_API_KEY;
     this.baseURL = config.baseURL || 'https://api.minimax.io/v1';
-    this.defaultModel = config.model || 'MiniMax-M2.7';
+    this.defaultModel = config.model || 'MiniMax-M3';
     // Maintain conversation history per chatId for multi-turn support
     this.conversations = new Map();
     // Track active abort controllers per chatId
@@ -40,7 +40,7 @@ export class MiniMaxProvider extends BaseProvider {
    * @param {Object} params
    * @param {string} params.prompt - The user message
    * @param {string} params.chatId - Chat session identifier
-   * @param {string} [params.model] - Model to use (MiniMax-M2.7 or MiniMax-M2.7-highspeed)
+   * @param {string} [params.model] - Model to use (MiniMax-M3, MiniMax-M2.7, or MiniMax-M2.7-highspeed)
    * @yields {Object} Normalized response chunks
    */
   async *query(params) {

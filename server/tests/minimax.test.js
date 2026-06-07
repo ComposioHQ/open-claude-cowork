@@ -35,9 +35,9 @@ describe('MiniMaxProvider', () => {
       expect(provider.baseURL).toBe('https://custom.api.io/v1');
     });
 
-    it('defaults to MiniMax-M2.7 model', () => {
+    it('defaults to MiniMax-M3 model', () => {
       const provider = new MiniMaxProvider(validConfig);
-      expect(provider.defaultModel).toBe('MiniMax-M2.7');
+      expect(provider.defaultModel).toBe('MiniMax-M3');
     });
 
     it('allows custom default model', () => {
@@ -127,7 +127,7 @@ describe('MiniMaxProvider', () => {
       vi.unstubAllGlobals();
     });
 
-    it('uses MiniMax-M2.7 as default model', async () => {
+    it('uses MiniMax-M3 as default model', async () => {
       const mockFetch = vi.fn().mockResolvedValue({
         ok: true,
         body: {
@@ -147,7 +147,7 @@ describe('MiniMaxProvider', () => {
       }
 
       const body = JSON.parse(mockFetch.mock.calls[0][1].body);
-      expect(body.model).toBe('MiniMax-M2.7');
+      expect(body.model).toBe('MiniMax-M3');
 
       vi.unstubAllGlobals();
     });

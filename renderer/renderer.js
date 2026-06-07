@@ -67,8 +67,9 @@ const providerModels = {
     { value: 'anthropic/claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5', desc: 'Fastest' }
   ],
   minimax: [
-    { value: 'MiniMax-M2.7', label: 'MiniMax-M2.7', desc: 'Peak Performance. Ultimate Value.', default: true },
-    { value: 'MiniMax-M2.7-highspeed', label: 'MiniMax-M2.7-highspeed', desc: 'Same performance, faster' }
+    { value: 'MiniMax-M3', label: 'MiniMax-M3', desc: '512K context, 128K output, image input', default: true },
+    { value: 'MiniMax-M2.7', label: 'MiniMax-M2.7', desc: 'Previous generation' },
+    { value: 'MiniMax-M2.7-highspeed', label: 'MiniMax-M2.7-highspeed', desc: 'Previous generation, lower latency' }
   ]
 };
 
