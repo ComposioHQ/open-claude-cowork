@@ -65,6 +65,11 @@ const providerModels = {
     { value: 'anthropic/claude-sonnet-4-5-20250929', label: 'Claude Sonnet 4.5', desc: 'Best balance' },
     { value: 'anthropic/claude-opus-4-5-20251101', label: 'Claude Opus 4.5', desc: 'Most capable' },
     { value: 'anthropic/claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5', desc: 'Fastest' }
+  ],
+  minimax: [
+    { value: 'MiniMax-M3', label: 'MiniMax-M3', desc: '512K context, 128K output, image input', default: true },
+    { value: 'MiniMax-M2.7', label: 'MiniMax-M2.7', desc: 'Previous generation' },
+    { value: 'MiniMax-M2.7-highspeed', label: 'MiniMax-M2.7-highspeed', desc: 'Previous generation, lower latency' }
   ]
 };
 
