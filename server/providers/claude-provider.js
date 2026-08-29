@@ -1,9 +1,16 @@
-import { query } from '@anthropic-ai/claude-agent-sdk';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { query as claudeQuery } from '@anthropic-ai/claude-agent-sdk';
 import { BaseProvider } from './base-provider.js';
+
+const PROJECT_ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..',
+  '..'
+);
 
 /**
  * Claude Agent SDK provider implementation
- * Matches the exact behavior from server.js
  */
 export class ClaudeProvider extends BaseProvider {
   constructor(config = {}) {
@@ -15,6 +22,8 @@ export class ClaudeProvider extends BaseProvider {
     ];
     this.defaultMaxTurns = config.maxTurns || 20;
     this.permissionMode = config.permissionMode || 'bypassPermissions';
+    this.cwd = config.cwd ?? PROJECT_ROOT;
+    this.queryClient = config.queryClient ?? claudeQuery;
     // Track active abort controllers per chatId
     this.abortControllers = new Map();
   }
@@ -39,7 +48,6 @@ export class ClaudeProvider extends BaseProvider {
 
   /**
    * Execute a query using Claude Agent SDK
-   * Matches the exact streaming logic from server.js
    *
    * @param {Object} params
    * @param {string} params.prompt - The user message
@@ -58,12 +66,13 @@ export class ClaudeProvider extends BaseProvider {
       maxTurns = this.defaultMaxTurns
     } = params;
 
-    // Build query options - exact match to server.js structure
+    // Build query options
     const queryOptions = {
       allowedTools,
       maxTurns,
       mcpServers,
       permissionMode: this.permissionMode,
+      cwd: this.cwd,
       settingSources: ['user', 'project']  // Enable Skills from filesystem
     };
 
@@ -86,8 +95,8 @@ export class ClaudeProvider extends BaseProvider {
     }
 
     try {
-    // Stream responses from Claude Agent SDK - matches server.js exactly
-    for await (const chunk of query({
+    // Stream responses from Claude Agent SDK
+    for await (const chunk of this.queryClient({
       prompt,
       options: queryOptions,
       abortSignal: abortController.signal
