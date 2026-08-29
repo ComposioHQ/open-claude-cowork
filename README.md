@@ -155,6 +155,11 @@ Instructions for Claude...
 
 See [Agent Skills documentation](https://platform.claude.com/docs/en/agent-sdk/skills) for details.
 
+Bundled examples:
+
+- `xquik-tweet-search`: search public X/Twitter posts through Xquik with a local
+  API key.
+
 ---
 
 ## Project Structure
